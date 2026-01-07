@@ -29,7 +29,7 @@
                 </form>
                 <div class="user-menu">
                     <?php if ($isLoggedIn): ?>
-                        <span style="font-size: 12px; color: #666;"><?= htmlspecialchars($currentUser['username']) ?></span>
+                        <a href="<?= url('profile.php') ?>" style="font-size: 12px; color: #666;"><?= htmlspecialchars($currentUser['username']) ?></a>
                         <a href="<?= url('logout.php') ?>" style="font-size: 12px;">Déconnexion</a>
                     <?php else: ?>
                         <a href="<?= url('login.php') ?>" style="font-size: 12px;">Connexion</a>
