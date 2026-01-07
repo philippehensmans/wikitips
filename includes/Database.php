@@ -105,5 +105,32 @@ class Database {
             $this->pdo->prepare("INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)")
                 ->execute(['admin', 'admin@example.com', $defaultPassword, 'admin']);
         }
+
+        // Table des pages (pour contenu modifiable comme l'accueil)
+        $this->pdo->exec("
+            CREATE TABLE IF NOT EXISTS pages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                slug TEXT UNIQUE NOT NULL,
+                title TEXT NOT NULL,
+                content TEXT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ");
+
+        // Créer la page d'accueil par défaut si elle n'existe pas
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM pages WHERE slug = 'home'");
+        if ((int)$stmt->fetchColumn() === 0) {
+            $defaultContent = '<p>Ce wiki est dédié à la veille et à l\'analyse d\'informations sous l\'angle des droits humains.</p>
+
+<p>Chaque article publié ici est analysé pour identifier les points d\'attention concernant :</p>
+
+<ul>
+    <li><strong>Les droits civils et politiques</strong> - libertés fondamentales, droit de vote, liberté d\'expression...</li>
+    <li><strong>Les droits économiques, sociaux et culturels</strong> - droit au travail, à la santé, à l\'éducation...</li>
+    <li><strong>Le droit international humanitaire</strong> - Conventions de Genève, protection des civils en conflit armé...</li>
+</ul>';
+            $this->pdo->prepare("INSERT INTO pages (slug, title, content) VALUES (?, ?, ?)")
+                ->execute(['home', 'Bienvenue', $defaultContent]);
+        }
     }
 }
