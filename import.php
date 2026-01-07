@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $newArticle = $articleModel->getById($articleId);
 
-                header('Location: /edit.php?id=' . $articleId);
+                header('Location: ' . url('edit.php?id=' . $articleId));
                 exit;
             }
         }
@@ -89,7 +89,7 @@ ob_start();
             <button type="submit" class="btn btn-primary" id="analyzeBtn">
                 Analyser et créer un brouillon
             </button>
-            <a href="/" class="btn">Annuler</a>
+            <a href="<?= url() ?>" class="btn">Annuler</a>
         </div>
 
         <p class="help-text" style="margin-top: 15px;">

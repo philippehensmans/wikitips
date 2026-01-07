@@ -6,7 +6,7 @@ require_once __DIR__ . '/config.php';
 
 $slug = $_GET['slug'] ?? '';
 if (!$slug) {
-    header('Location: /');
+    header('Location: ' . url());
     exit;
 }
 
@@ -21,7 +21,7 @@ if (!$article) {
     <div class="article-header">
         <h1>Article non trouvé</h1>
     </div>
-    <p>L'article demandé n'existe pas. <a href="/">Retour à l'accueil</a></p>
+    <p>L'article demandé n'existe pas. <a href="<?= url() ?>">Retour à l'accueil</a></p>
     <?php
     $content = ob_get_clean();
     require __DIR__ . '/templates/layout.php';
@@ -35,7 +35,7 @@ ob_start();
 
 <div class="article-header">
     <div class="article-actions">
-        <a href="/edit.php?id=<?= $article['id'] ?>">Modifier</a>
+        <a href="<?= url('edit.php?id=' . $article['id']) ?>">Modifier</a>
         <a href="#" onclick="confirmDelete(<?= $article['id'] ?>); return false;">Supprimer</a>
     </div>
     <h1><?= htmlspecialchars($article['title']) ?></h1>
@@ -70,7 +70,7 @@ ob_start();
             <div class="infobox-label">Catégories</div>
             <div class="infobox-value">
                 <?php foreach ($article['categories'] as $cat): ?>
-                    <a href="/category.php?slug=<?= htmlspecialchars($cat['slug']) ?>"><?= htmlspecialchars($cat['name']) ?></a><br>
+                    <a href="<?= url('category.php?slug=' . htmlspecialchars($cat['slug'])) ?>"><?= htmlspecialchars($cat['name']) ?></a><br>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -110,7 +110,7 @@ ob_start();
 <div class="article-categories">
     <strong>Catégories :</strong>
     <?php foreach ($article['categories'] as $cat): ?>
-        <a href="/category.php?slug=<?= htmlspecialchars($cat['slug']) ?>" class="category-tag"><?= htmlspecialchars($cat['name']) ?></a>
+        <a href="<?= url('category.php?slug=' . htmlspecialchars($cat['slug'])) ?>" class="category-tag"><?= htmlspecialchars($cat['name']) ?></a>
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
@@ -118,11 +118,11 @@ ob_start();
 <script>
 function confirmDelete(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
-        fetch('/api/articles/' + id, { method: 'DELETE' })
+        fetch('<?= url('api/index.php?action=articles') ?>' + '/' + id, { method: 'DELETE' })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '/articles.php';
+                    window.location.href = '<?= url('articles.php') ?>';
                 } else {
                     alert('Erreur lors de la suppression');
                 }

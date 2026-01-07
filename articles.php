@@ -19,24 +19,24 @@ ob_start();
 
 <div class="article-section">
     <p>
-        <a href="/articles.php" class="btn <?= !$status ? 'btn-primary' : '' ?>">Tous</a>
-        <a href="/articles.php?status=published" class="btn <?= $status === 'published' ? 'btn-primary' : '' ?>">Publiés</a>
-        <a href="/articles.php?status=draft" class="btn <?= $status === 'draft' ? 'btn-primary' : '' ?>">Brouillons</a>
-        <a href="/new.php" class="btn">+ Nouvel article</a>
+        <a href="<?= url('articles.php') ?>" class="btn <?= !$status ? 'btn-primary' : '' ?>">Tous</a>
+        <a href="<?= url('articles.php?status=published') ?>" class="btn <?= $status === 'published' ? 'btn-primary' : '' ?>">Publiés</a>
+        <a href="<?= url('articles.php?status=draft') ?>" class="btn <?= $status === 'draft' ? 'btn-primary' : '' ?>">Brouillons</a>
+        <a href="<?= url('new.php') ?>" class="btn">+ Nouvel article</a>
     </p>
 </div>
 
 <?php if (empty($articles)): ?>
     <div class="alert alert-info">
         Aucun article trouvé.
-        <a href="/new.php">Créer un article</a> ou <a href="/import.php">importer du contenu</a>.
+        <a href="<?= url('new.php') ?>">Créer un article</a> ou <a href="<?= url('import.php') ?>">importer du contenu</a>.
     </div>
 <?php else: ?>
     <ul class="article-list">
         <?php foreach ($articles as $article): ?>
             <li class="article-list-item">
                 <h3>
-                    <a href="/article.php?slug=<?= htmlspecialchars($article['slug']) ?>"><?= htmlspecialchars($article['title']) ?></a>
+                    <a href="<?= url('article.php?slug=' . htmlspecialchars($article['slug'])) ?>"><?= htmlspecialchars($article['title']) ?></a>
                     <span class="status-badge status-<?= $article['status'] ?>"><?= $article['status'] === 'published' ? 'Publié' : 'Brouillon' ?></span>
                 </h3>
                 <?php if ($article['summary']): ?>
@@ -51,7 +51,7 @@ ob_start();
                         <?php endforeach; ?>
                     <?php endif; ?>
                     |
-                    <a href="/edit.php?id=<?= $article['id'] ?>">Modifier</a>
+                    <a href="<?= url('edit.php?id=' . $article['id']) ?>">Modifier</a>
                 </div>
             </li>
         <?php endforeach; ?>

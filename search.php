@@ -21,7 +21,7 @@ ob_start();
 </div>
 
 <div class="article-section">
-    <form action="/search.php" method="get" style="margin-bottom: 20px;">
+    <form action="<?= url('search.php') ?>" method="get" style="margin-bottom: 20px;">
         <div style="display: flex; gap: 10px;">
             <input type="text" name="q" value="<?= htmlspecialchars($query) ?>" placeholder="Rechercher..." style="flex: 1; padding: 10px; font-size: 16px;">
             <button type="submit" class="btn btn-primary">Rechercher</button>
@@ -43,7 +43,7 @@ ob_start();
             <?php foreach ($results as $article): ?>
                 <li class="article-list-item">
                     <h3>
-                        <a href="/article.php?slug=<?= htmlspecialchars($article['slug']) ?>"><?= htmlspecialchars($article['title']) ?></a>
+                        <a href="<?= url('article.php?slug=' . htmlspecialchars($article['slug'])) ?>"><?= htmlspecialchars($article['title']) ?></a>
                         <span class="status-badge status-<?= $article['status'] ?>"><?= $article['status'] === 'published' ? 'Publié' : 'Brouillon' ?></span>
                     </h3>
                     <?php if ($article['summary']): ?>

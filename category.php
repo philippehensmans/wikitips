@@ -6,7 +6,7 @@ require_once __DIR__ . '/config.php';
 
 $slug = $_GET['slug'] ?? '';
 if (!$slug) {
-    header('Location: /categories.php');
+    header('Location: ' . url('categories.php'));
     exit;
 }
 
@@ -21,7 +21,7 @@ if (!$category) {
     <div class="article-header">
         <h1>Catégorie non trouvée</h1>
     </div>
-    <p>La catégorie demandée n'existe pas. <a href="/categories.php">Voir toutes les catégories</a></p>
+    <p>La catégorie demandée n'existe pas. <a href="<?= url('categories.php') ?>">Voir toutes les catégories</a></p>
     <?php
     $content = ob_get_clean();
     require __DIR__ . '/templates/layout.php';
@@ -52,7 +52,7 @@ ob_start();
     <ul class="article-list">
         <?php foreach ($articles as $article): ?>
             <li class="article-list-item">
-                <h3><a href="/article.php?slug=<?= htmlspecialchars($article['slug']) ?>"><?= htmlspecialchars($article['title']) ?></a></h3>
+                <h3><a href="<?= url('article.php?slug=' . htmlspecialchars($article['slug'])) ?>"><?= htmlspecialchars($article['title']) ?></a></h3>
                 <?php if ($article['summary']): ?>
                     <p class="summary"><?= htmlspecialchars(substr($article['summary'], 0, 200)) ?>...</p>
                 <?php endif; ?>

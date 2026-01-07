@@ -23,7 +23,7 @@ ob_start();
 <ul class="article-list">
     <?php foreach ($categories as $category): ?>
         <li class="article-list-item">
-            <h3><a href="/category.php?slug=<?= htmlspecialchars($category['slug']) ?>"><?= htmlspecialchars($category['name']) ?></a></h3>
+            <h3><a href="<?= url('category.php?slug=' . htmlspecialchars($category['slug'])) ?>"><?= htmlspecialchars($category['name']) ?></a></h3>
             <?php if ($category['description']): ?>
                 <p class="summary"><?= htmlspecialchars($category['description']) ?></p>
             <?php endif; ?>
