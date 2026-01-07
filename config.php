@@ -46,6 +46,24 @@ if (!defined('API_SECRET_KEY')) {
     define('API_SECRET_KEY', getenv('API_SECRET_KEY') ?: 'change_this_secret_key_in_production');
 }
 
+// Chemin de base (auto-détecté ou défini manuellement)
+// Ex: si installé dans /wikitips/, définir BASE_PATH = '/wikitips'
+if (!defined('BASE_PATH')) {
+    // Auto-détection du chemin de base
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $basePath = rtrim(dirname($scriptName), '/');
+    // Éviter les doubles slashes pour la racine
+    define('BASE_PATH', $basePath === '/' ? '' : $basePath);
+}
+
+/**
+ * Génère une URL avec le chemin de base
+ */
+function url(string $path = ''): string {
+    $path = ltrim($path, '/');
+    return BASE_PATH . '/' . $path;
+}
+
 // Fuseau horaire
 date_default_timezone_set('Europe/Brussels');
 

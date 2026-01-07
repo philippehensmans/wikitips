@@ -6,7 +6,7 @@ require_once __DIR__ . '/config.php';
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
-    header('Location: /articles.php');
+    header('Location: ' . url('articles.php'));
     exit;
 }
 
@@ -14,7 +14,7 @@ $articleModel = new Article();
 $article = $articleModel->getById($id);
 
 if (!$article) {
-    header('Location: /articles.php');
+    header('Location: ' . url('articles.php'));
     exit;
 }
 
@@ -63,7 +63,7 @@ ob_start();
 <div class="article-header">
     <h1>Modifier : <?= htmlspecialchars($article['title']) ?></h1>
     <div class="article-meta">
-        <a href="/article.php?slug=<?= htmlspecialchars($article['slug']) ?>">Voir l'article</a>
+        <a href="<?= url('article.php?slug=' . htmlspecialchars($article['slug'])) ?>">Voir l'article</a>
     </div>
 </div>
 
@@ -123,7 +123,7 @@ ob_start();
 
         <div class="btn-group">
             <button type="submit" class="btn btn-primary">Enregistrer</button>
-            <a href="/article.php?slug=<?= htmlspecialchars($article['slug']) ?>" class="btn">Annuler</a>
+            <a href="<?= url('article.php?slug=' . htmlspecialchars($article['slug'])) ?>" class="btn">Annuler</a>
             <button type="button" class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
         </div>
     </form>
@@ -132,11 +132,11 @@ ob_start();
 <script>
 function confirmDelete() {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
-        fetch('/api/articles/<?= $id ?>', { method: 'DELETE' })
+        fetch('<?= url('api/index.php?action=articles') ?>/<?= $id ?>', { method: 'DELETE' })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '/articles.php';
+                    window.location.href = '<?= url('articles.php') ?>';
                 } else {
                     alert('Erreur lors de la suppression');
                 }

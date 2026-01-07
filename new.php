@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'categories' => array_map('intval', $categoryIds)
         ]);
 
-        header('Location: /article.php?slug=' . $articleModel->getById($articleId)['slug']);
+        header('Location: ' . url('article.php?slug=' . $articleModel->getById($articleId)['slug']));
         exit;
     }
 }
@@ -107,7 +107,7 @@ ob_start();
 
         <div class="btn-group">
             <button type="submit" class="btn btn-primary">Créer l'article</button>
-            <a href="/" class="btn">Annuler</a>
+            <a href="<?= url() ?>" class="btn">Annuler</a>
         </div>
     </form>
 </div>

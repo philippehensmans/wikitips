@@ -32,7 +32,7 @@ ob_start();
 <?php if ($draftCount > 0): ?>
 <div class="alert alert-info">
     Vous avez <strong><?= $draftCount ?></strong> article(s) en brouillon.
-    <a href="/articles.php?status=draft">Voir les brouillons</a>
+    <a href="<?= url('articles.php?status=draft') ?>">Voir les brouillons</a>
 </div>
 <?php endif; ?>
 
@@ -41,12 +41,12 @@ ob_start();
 
     <?php if (empty($recentArticles)): ?>
         <p>Aucun article publié pour le moment.</p>
-        <p><a href="/new.php" class="btn btn-primary">Créer votre premier article</a></p>
+        <p><a href="<?= url('new.php') ?>" class="btn btn-primary">Créer votre premier article</a></p>
     <?php else: ?>
         <ul class="article-list">
             <?php foreach ($recentArticles as $article): ?>
                 <li class="article-list-item">
-                    <h3><a href="/article.php?slug=<?= htmlspecialchars($article['slug']) ?>"><?= htmlspecialchars($article['title']) ?></a></h3>
+                    <h3><a href="<?= url('article.php?slug=' . htmlspecialchars($article['slug'])) ?>"><?= htmlspecialchars($article['title']) ?></a></h3>
                     <?php if ($article['summary']): ?>
                         <p class="summary"><?= htmlspecialchars(substr($article['summary'], 0, 200)) ?>...</p>
                     <?php endif; ?>
@@ -76,13 +76,13 @@ ob_start();
 
     <h3>Méthode 2 : Import manuel</h3>
     <p>
-        Utilisez la page <a href="/import.php">Importer</a> pour coller du texte ou une URL.
+        Utilisez la page <a href="<?= url('import.php') ?>">Importer</a> pour coller du texte ou une URL.
         Le contenu sera analysé et un brouillon d'article sera créé.
     </p>
 
     <h3>Méthode 3 : Création directe</h3>
     <p>
-        Créez un article directement via la page <a href="/new.php">Nouvel article</a>.
+        Créez un article directement via la page <a href="<?= url('new.php') ?>">Nouvel article</a>.
         Vous pouvez rédiger manuellement le contenu et l'analyse.
     </p>
 </div>
