@@ -1,0 +1,33 @@
+# Fichiers de données
+/data/*.db
+/data/*.sqlite
+
+# Fichiers de configuration locaux
+.env
+config.local.php
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/logs/
+
+# Temporary files
+/tmp/
+*.tmp
+
+# Dependencies (if using composer)
+/vendor/
+
+# Extension Chrome packagée
+*.crx
+*.pem
