@@ -4,6 +4,10 @@
  */
 require_once __DIR__ . '/config.php';
 
+// Authentification requise
+$auth = new Auth();
+$auth->requireLogin();
+
 $pageTitle = 'Nouvel article - ' . SITE_NAME;
 
 $categoryModel = new Category();

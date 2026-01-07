@@ -83,5 +83,27 @@ class Database {
         foreach ($defaultCategories as $cat) {
             $stmt->execute($cat);
         }
+
+        // Table des utilisateurs
+        $this->pdo->exec("
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                role TEXT DEFAULT 'editor',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                last_login DATETIME
+            )
+        ");
+
+        // Créer un utilisateur admin par défaut si aucun n'existe
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM users");
+        if ((int)$stmt->fetchColumn() === 0) {
+            // Mot de passe par défaut: admin123 (à changer immédiatement!)
+            $defaultPassword = password_hash('admin123', PASSWORD_DEFAULT);
+            $this->pdo->prepare("INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)")
+                ->execute(['admin', 'admin@example.com', $defaultPassword, 'admin']);
+        }
     }
 }

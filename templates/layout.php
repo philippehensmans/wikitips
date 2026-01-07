@@ -8,6 +8,12 @@
     <link rel="icon" href="<?= url('assets/images/favicon.ico') ?>" type="image/x-icon">
 </head>
 <body>
+    <?php
+    $auth = new Auth();
+    $isLoggedIn = $auth->isLoggedIn();
+    $currentUser = $isLoggedIn ? $auth->getUser() : null;
+    ?>
+
     <header class="wiki-header">
         <div class="wiki-header-inner">
             <a href="<?= url() ?>" class="wiki-logo">
@@ -16,10 +22,20 @@
                     <div class="subtitle"><?= SITE_DESCRIPTION ?></div>
                 </div>
             </a>
-            <form class="wiki-search" action="<?= url('search.php') ?>" method="get">
-                <input type="text" name="q" placeholder="Rechercher..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
-                <button type="submit">Rechercher</button>
-            </form>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <form class="wiki-search" action="<?= url('search.php') ?>" method="get">
+                    <input type="text" name="q" placeholder="Rechercher..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+                    <button type="submit">Rechercher</button>
+                </form>
+                <div class="user-menu">
+                    <?php if ($isLoggedIn): ?>
+                        <span style="font-size: 12px; color: #666;"><?= htmlspecialchars($currentUser['username']) ?></span>
+                        <a href="<?= url('logout.php') ?>" style="font-size: 12px;">Déconnexion</a>
+                    <?php else: ?>
+                        <a href="<?= url('login.php') ?>" style="font-size: 12px;">Connexion</a>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -27,8 +43,10 @@
         <a href="<?= url() ?>">Accueil</a>
         <a href="<?= url('articles.php') ?>">Articles</a>
         <a href="<?= url('categories.php') ?>">Catégories</a>
-        <a href="<?= url('new.php') ?>">Nouvel article</a>
-        <a href="<?= url('import.php') ?>">Importer</a>
+        <?php if ($isLoggedIn): ?>
+            <a href="<?= url('new.php') ?>">Nouvel article</a>
+            <a href="<?= url('import.php') ?>">Importer</a>
+        <?php endif; ?>
     </nav>
 
     <div class="wiki-container">
@@ -38,8 +56,10 @@
                 <ul>
                     <li><a href="<?= url() ?>">Page d'accueil</a></li>
                     <li><a href="<?= url('articles.php') ?>">Tous les articles</a></li>
-                    <li><a href="<?= url('articles.php?status=draft') ?>">Brouillons</a></li>
-                    <li><a href="<?= url('new.php') ?>">Créer un article</a></li>
+                    <?php if ($isLoggedIn): ?>
+                        <li><a href="<?= url('articles.php?status=draft') ?>">Brouillons</a></li>
+                        <li><a href="<?= url('new.php') ?>">Créer un article</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
 
@@ -55,13 +75,27 @@
                 </ul>
             </div>
 
+            <?php if ($isLoggedIn): ?>
             <div class="sidebar-section">
                 <h3>Outils</h3>
                 <ul>
                     <li><a href="<?= url('import.php') ?>">Importer du contenu</a></li>
                     <li><a href="<?= url('api/index.php?action=health') ?>" target="_blank">État de l'API</a></li>
+                    <?php if ($auth->isAdmin()): ?>
+                        <li><a href="<?= url('users.php') ?>">Gérer les utilisateurs</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
+            <?php endif; ?>
+
+            <?php if (!$isLoggedIn): ?>
+            <div class="sidebar-section">
+                <h3>Compte</h3>
+                <ul>
+                    <li><a href="<?= url('login.php') ?>">Se connecter</a></li>
+                </ul>
+            </div>
+            <?php endif; ?>
         </aside>
 
         <main class="wiki-content">
