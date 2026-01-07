@@ -48,11 +48,13 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans ```json) cont
 
 {
     "title": "Titre proposé pour l'article (concis et informatif)",
-    "summary": "Résumé du contenu en 2-3 paragraphes",
+    "summary": "Résumé détaillé du contenu en 4-5 paragraphes. Inclure le contexte, les faits principaux, les enjeux, les acteurs impliqués et les perspectives. Le résumé doit être suffisamment complet pour qu'un lecteur comprenne l'essentiel sans lire l'article original.",
     "main_points": [
         "Point principal 1",
         "Point principal 2",
-        "Point principal 3"
+        "Point principal 3",
+        "Point principal 4",
+        "Point principal 5"
     ],
     "human_rights_analysis": {
         "civil_political_rights": {
