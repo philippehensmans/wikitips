@@ -102,7 +102,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         showStatus('Envoi au serveur et analyse via Claude AI...', 'loading');
 
         try {
-            const response = await fetch(config.serverUrl + '/api/analyze', {
+            // Construire l'URL de l'API (supporte /api/analyze ou /api/index.php?action=analyze)
+            let apiUrl = config.serverUrl.replace(/\/+$/, ''); // Retirer les slashes finaux
+            if (apiUrl.includes('/api/index.php')) {
+                apiUrl += '?action=analyze';
+            } else if (apiUrl.endsWith('/api')) {
+                apiUrl += '/analyze';
+            } else {
+                apiUrl += '/api/index.php?action=analyze';
+            }
+
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -122,8 +132,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
                 // Ouvrir l'éditeur dans un nouvel onglet
                 if (data.data.article_id) {
+                    // Construire l'URL de base du site
+                    let baseUrl = config.serverUrl.replace(/\/+$/, '');
+                    baseUrl = baseUrl.replace(/\/api(\/index\.php)?$/, '');
                     chrome.tabs.create({
-                        url: config.serverUrl + '/edit.php?id=' + data.data.article_id
+                        url: baseUrl + '/edit.php?id=' + data.data.article_id
                     });
                 }
             } else {

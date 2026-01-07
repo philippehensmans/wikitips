@@ -18,12 +18,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Router simple
+// Router simple - supporte mod_rewrite ET accès direct
 $requestUri = $_SERVER['REQUEST_URI'];
-$basePath = '/api';
 $path = parse_url($requestUri, PHP_URL_PATH);
-$path = str_replace($basePath, '', $path);
+
+// Supprimer les préfixes possibles
+$path = preg_replace('#^.*/api(/index\.php)?#', '', $path);
 $path = trim($path, '/');
+
+// Aussi supporter ?action=xxx pour les serveurs sans mod_rewrite
+if (empty($path) && isset($_GET['action'])) {
+    $path = $_GET['action'];
+}
+
 $segments = $path ? explode('/', $path) : [];
 $method = $_SERVER['REQUEST_METHOD'];
 
