@@ -4,6 +4,10 @@
  */
 require_once __DIR__ . '/config.php';
 
+$bluesky = new BlueskyService();
+$blueskyConfigured = $bluesky->isConfigured();
+$blueskyMessage = $_GET['bluesky'] ?? '';
+
 $slug = $_GET['slug'] ?? '';
 if (!$slug) {
     header('Location: ' . url());
@@ -33,9 +37,22 @@ $pageTitle = htmlspecialchars($article['title']) . ' - ' . SITE_NAME;
 ob_start();
 ?>
 
+<?php if ($blueskyMessage === 'success'): ?>
+<div class="success-message">
+    ✓ Article partagé sur Bluesky avec succès !
+</div>
+<?php elseif ($blueskyMessage === 'error'): ?>
+<div class="error-message">
+    ✗ Erreur lors du partage sur Bluesky. <?= htmlspecialchars($_GET['error'] ?? '') ?>
+</div>
+<?php endif; ?>
+
 <div class="article-header">
     <div class="article-actions">
         <a href="<?= url('edit.php?id=' . $article['id']) ?>">Modifier</a>
+        <?php if ($blueskyConfigured): ?>
+        <a href="<?= url('share-bluesky.php?id=' . $article['id']) ?>" class="btn-bluesky" title="Partager sur Bluesky">🦋 Bluesky</a>
+        <?php endif; ?>
         <a href="#" onclick="confirmDelete(<?= $article['id'] ?>); return false;">Supprimer</a>
     </div>
     <h1><?= htmlspecialchars($article['title']) ?></h1>

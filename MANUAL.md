@@ -16,10 +16,14 @@
    - [Extension Chrome](#extension-chrome)
    - [Analyse IA](#analyse-ia)
    - [Administration](#administration)
-7. [API REST](#api-rest)
-8. [Sécurité](#sécurité)
-9. [Personnalisation](#personnalisation)
-10. [Dépannage](#dépannage)
+7. [Intégration Bluesky](#intégration-bluesky)
+   - [Configuration Bluesky](#configuration-bluesky)
+   - [Partage manuel](#partage-manuel)
+   - [Partage automatique](#partage-automatique)
+8. [API REST](#api-rest)
+9. [Sécurité](#sécurité)
+10. [Personnalisation](#personnalisation)
+11. [Dépannage](#dépannage)
 
 ---
 
@@ -76,6 +80,15 @@
 | Menu contextuel | Clic droit pour analyser |
 | Envoi direct | Transfert vers WikiTips en un clic |
 
+### Partage social (Bluesky)
+
+| Fonctionnalité | Description |
+|----------------|-------------|
+| Partage manuel | Bouton pour partager un article sur Bluesky |
+| Partage automatique | Option pour publier automatiquement à la création |
+| Personnalisation | Texte du post modifiable avant envoi |
+| Carte de lien | Aperçu riche avec titre et description |
+
 ---
 
 ## Architecture technique
@@ -109,6 +122,7 @@ wikitips/
 ├── logout.php                 # Déconnexion
 ├── register.php               # Inscription
 ├── profile.php                # Profil utilisateur
+├── share-bluesky.php          # Partage sur Bluesky
 │
 ├── includes/
 │   ├── Database.php           # Classe de gestion SQLite
@@ -116,7 +130,8 @@ wikitips/
 │   ├── Category.php           # Modèle Catégorie
 │   ├── Auth.php               # Gestion authentification
 │   ├── Page.php               # Gestion pages statiques
-│   └── ClaudeService.php      # Intégration API Claude
+│   ├── ClaudeService.php      # Intégration API Claude
+│   └── BlueskyService.php     # Intégration Bluesky (AT Protocol)
 │
 ├── api/
 │   ├── index.php              # Routeur API REST
@@ -458,6 +473,139 @@ La gestion des utilisateurs se fait actuellement en base de données. Pour promo
 ```sql
 UPDATE users SET role = 'admin' WHERE username = 'nom_utilisateur';
 ```
+
+---
+
+## Intégration Bluesky
+
+WikiTips permet de partager automatiquement vos articles sur Bluesky, le réseau social décentralisé basé sur le protocole AT.
+
+### Configuration Bluesky
+
+#### Étape 1 : Créer un App Password
+
+Pour des raisons de sécurité, Bluesky utilise des "App Passwords" plutôt que votre mot de passe principal.
+
+1. Connectez-vous à [bsky.app](https://bsky.app)
+2. Allez dans **Settings** (Paramètres)
+3. Cliquez sur **App Passwords**
+4. Cliquez sur **Add App Password**
+5. Donnez un nom (ex: "WikiTips")
+6. Copiez le mot de passe généré (il ne sera plus affiché)
+
+#### Étape 2 : Configurer WikiTips
+
+Ajoutez dans votre fichier `config.local.php` :
+
+```php
+<?php
+// Configuration Bluesky
+define('BLUESKY_IDENTIFIER', 'votre-handle.bsky.social'); // ou votre email
+define('BLUESKY_APP_PASSWORD', 'xxxx-xxxx-xxxx-xxxx');    // App Password créé
+
+// Optionnel : activer le partage automatique par défaut
+define('BLUESKY_AUTO_SHARE', true);
+```
+
+| Paramètre | Description | Exemple |
+|-----------|-------------|---------|
+| `BLUESKY_IDENTIFIER` | Votre handle Bluesky ou email | `user.bsky.social` |
+| `BLUESKY_APP_PASSWORD` | App Password (pas votre vrai mot de passe !) | `abcd-1234-efgh-5678` |
+| `BLUESKY_AUTO_SHARE` | Cocher par défaut l'option de partage | `true` ou `false` |
+
+### Partage manuel
+
+Une fois Bluesky configuré, un bouton **🦋 Bluesky** apparaît sur chaque article.
+
+#### Procédure
+
+1. Ouvrez l'article que vous souhaitez partager
+2. Cliquez sur le bouton **🦋 Bluesky** dans les actions
+3. Une page de prévisualisation s'affiche avec :
+   - Le texte du post (modifiable, max 300 caractères)
+   - Un aperçu de l'article
+4. Modifiez le texte si nécessaire
+5. Cliquez sur **Publier sur Bluesky**
+6. Vous êtes redirigé vers l'article avec un message de confirmation
+
+#### Format du post
+
+Le post généré automatiquement comprend :
+
+```
+📰 Titre de l'article
+
+Résumé de l'article (jusqu'à 200 caractères)...
+
+#DroitsHumains #WikiTips
+```
+
+Plus une **carte de lien** avec :
+- Le titre de l'article
+- Une description (extrait du résumé)
+- L'URL vers l'article complet
+
+### Partage automatique
+
+Vous pouvez partager automatiquement chaque nouvel article publié sur Bluesky.
+
+#### Option 1 : À la création de l'article
+
+1. Lors de la création d'un article, une option **🦋 Partager sur Bluesky à la publication** apparaît
+2. Cochez cette option
+3. Sélectionnez le statut **Publié**
+4. Cliquez sur **Créer l'article**
+5. L'article est créé ET partagé sur Bluesky automatiquement
+
+> **Note** : Le partage automatique ne fonctionne que si l'article est publié (pas en brouillon).
+
+#### Option 2 : Activer par défaut
+
+Pour que l'option soit cochée par défaut sur tous les nouveaux articles :
+
+```php
+define('BLUESKY_AUTO_SHARE', true);
+```
+
+### Limitations
+
+| Aspect | Limite |
+|--------|--------|
+| Longueur du texte | 300 caractères maximum |
+| Images | Non supportées (carte de lien uniquement) |
+| Fréquence | Pas de limite côté WikiTips |
+
+### Résolution des problèmes Bluesky
+
+#### "Authentification Bluesky échouée"
+
+**Causes possibles :**
+- Handle incorrect (vérifiez l'orthographe)
+- App Password expiré ou révoqué
+- Utilisation du mot de passe principal au lieu de l'App Password
+
+**Solution :**
+1. Vérifiez que `BLUESKY_IDENTIFIER` correspond exactement à votre handle
+2. Créez un nouvel App Password sur bsky.app
+3. Mettez à jour `BLUESKY_APP_PASSWORD`
+
+#### "Le bouton Bluesky n'apparaît pas"
+
+**Cause :** Bluesky n'est pas configuré.
+
+**Solution :** Vérifiez que `BLUESKY_IDENTIFIER` et `BLUESKY_APP_PASSWORD` sont définis dans `config.local.php`.
+
+#### "Erreur lors de la publication"
+
+**Causes possibles :**
+- Texte trop long (> 300 caractères)
+- Problème de connexion réseau
+- API Bluesky temporairement indisponible
+
+**Solution :**
+1. Réduisez la longueur du texte
+2. Réessayez plus tard
+3. Vérifiez le status de Bluesky sur [status.bsky.app](https://status.bsky.app)
 
 ---
 
