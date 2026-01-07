@@ -4,6 +4,10 @@
  */
 require_once __DIR__ . '/config.php';
 
+// Authentification requise
+$auth = new Auth();
+$auth->requireLogin();
+
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
     header('Location: ' . url('articles.php'));
