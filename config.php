@@ -46,6 +46,18 @@ if (!defined('API_SECRET_KEY')) {
     define('API_SECRET_KEY', getenv('API_SECRET_KEY') ?: 'change_this_secret_key_in_production');
 }
 
+// Configuration Bluesky (AT Protocol)
+// Créez un "App Password" sur https://bsky.app/settings/app-passwords
+if (!defined('BLUESKY_IDENTIFIER')) {
+    define('BLUESKY_IDENTIFIER', ''); // Votre handle (ex: user.bsky.social) ou email
+}
+if (!defined('BLUESKY_APP_PASSWORD')) {
+    define('BLUESKY_APP_PASSWORD', ''); // App Password (pas votre mot de passe principal)
+}
+if (!defined('BLUESKY_AUTO_SHARE')) {
+    define('BLUESKY_AUTO_SHARE', false); // Partage automatique à la création d'article
+}
+
 // Chemin de base (auto-détecté ou défini manuellement)
 // Ex: si installé dans /wikitips/, définir BASE_PATH = '/wikitips'
 if (!defined('BASE_PATH')) {
