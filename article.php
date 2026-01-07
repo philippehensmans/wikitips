@@ -34,6 +34,23 @@ if (!$article) {
 
 $pageTitle = htmlspecialchars($article['title']) . ' - ' . SITE_NAME;
 
+// Construire l'URL de l'article pour le partage
+$articleUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://');
+$articleUrl .= $_SERVER['HTTP_HOST'];
+$articleUrl .= url('article.php?slug=' . urlencode($article['slug']));
+
+// Message WhatsApp
+$whatsappText = "📰 " . $article['title'] . "\n\n";
+if (!empty($article['summary'])) {
+    $summaryShort = mb_substr($article['summary'], 0, 150);
+    if (mb_strlen($article['summary']) > 150) {
+        $summaryShort .= '...';
+    }
+    $whatsappText .= $summaryShort . "\n\n";
+}
+$whatsappText .= "🔗 " . $articleUrl;
+$whatsappUrl = 'https://wa.me/?text=' . rawurlencode($whatsappText);
+
 ob_start();
 ?>
 
@@ -50,6 +67,7 @@ ob_start();
 <div class="article-header">
     <div class="article-actions">
         <a href="<?= url('edit.php?id=' . $article['id']) ?>">Modifier</a>
+        <a href="<?= htmlspecialchars($whatsappUrl) ?>" class="btn-whatsapp" target="_blank" title="Partager sur WhatsApp">💬 WhatsApp</a>
         <?php if ($blueskyConfigured): ?>
         <a href="<?= url('share-bluesky.php?id=' . $article['id']) ?>" class="btn-bluesky" title="Partager sur Bluesky">🦋 Bluesky</a>
         <?php endif; ?>

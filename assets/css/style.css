@@ -494,6 +494,24 @@ a:hover {
     color: white;
 }
 
+.btn-whatsapp {
+    background: #25D366;
+    border-color: #128C7E;
+    color: white !important;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+.btn-whatsapp:hover {
+    background: #128C7E;
+    text-decoration: none;
+}
+
+.btn-whatsapp:visited {
+    color: white;
+}
+
 .btn-group {
     display: flex;
     gap: 10px;
