@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'source_url' => $sourceUrl,
                     'source_content' => $content,
                     'summary' => $result['summary'],
+                    'bluesky_post' => $result['bluesky_post'] ?? null,
                     'main_points' => $result['main_points'],
                     'human_rights_analysis' => $result['human_rights_analysis'],
                     'categories' => $categoryIds,

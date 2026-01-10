@@ -219,6 +219,7 @@ function handleAnalyze(string $method, array $input): array {
             'source_url' => $input['source_url'] ?? null,
             'source_content' => $input['content'],
             'summary' => $result['summary'],
+            'bluesky_post' => $result['bluesky_post'] ?? null,
             'main_points' => $result['main_points'],
             'human_rights_analysis' => $result['human_rights_analysis'],
             'categories' => $categoryIds,

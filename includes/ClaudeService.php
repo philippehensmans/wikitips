@@ -48,7 +48,8 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans ```json) cont
 
 {
     "title": "Titre proposé pour l'article (concis et informatif)",
-    "summary": "Résumé détaillé du contenu en 4-5 paragraphes. Inclure le contexte, les faits principaux, les enjeux, les acteurs impliqués et les perspectives. Le résumé doit être suffisamment complet pour qu'un lecteur comprenne l'essentiel sans lire l'article original.",
+    "summary": "Résumé détaillé et approfondi du contenu en 400-500 mots. Inclure le contexte historique et actuel, les faits principaux avec des détails significatifs, les enjeux à court et long terme, les acteurs impliqués et leurs positions, les implications pour les droits humains, et les perspectives d'évolution. Le résumé doit être suffisamment complet et nuancé pour qu'un lecteur comprenne pleinement le sujet sans lire l'article original.",
+    "bluesky_post": "Texte accrocheur pour Bluesky (max 250 caractères, sans hashtags). Doit donner envie de lire l'article en posant une question percutante, en révélant un fait marquant, ou en soulignant l'urgence du sujet. Ne pas simplement résumer, mais interpeller le lecteur.",
     "main_points": [
         "Point principal 1",
         "Point principal 2",
@@ -168,6 +169,7 @@ PROMPT;
         return [
             'title' => $data['title'] ?? 'Sans titre',
             'summary' => $data['summary'] ?? '',
+            'bluesky_post' => $data['bluesky_post'] ?? '',
             'main_points' => $mainPointsHtml,
             'main_points_raw' => $data['main_points'] ?? [],
             'human_rights_analysis' => $analysisHtml,

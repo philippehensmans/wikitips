@@ -30,6 +30,17 @@ class Database {
         return $this->pdo;
     }
 
+    /**
+     * Ajoute une colonne à une table si elle n'existe pas
+     */
+    private function addColumnIfNotExists(string $table, string $column, string $type): void {
+        $stmt = $this->pdo->query("PRAGMA table_info($table)");
+        $columns = $stmt->fetchAll(PDO::FETCH_COLUMN, 1);
+        if (!in_array($column, $columns)) {
+            $this->pdo->exec("ALTER TABLE $table ADD COLUMN $column $type");
+        }
+    }
+
     private function initTables(): void {
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS articles (
@@ -47,6 +58,9 @@ class Database {
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ");
+
+        // Migration: Ajouter la colonne bluesky_post si elle n'existe pas
+        $this->addColumnIfNotExists('articles', 'bluesky_post', 'TEXT');
 
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS categories (
