@@ -188,16 +188,15 @@ class BlueskyService
      */
     public function formatArticlePost(array $article, string $articleUrl): string
     {
-        $title = $article['title'] ?? 'Article';
-
         // Utiliser le texte Bluesky personnalisé s'il existe, sinon fallback sur le résumé
         $blueskyPost = $article['bluesky_post'] ?? '';
 
         if (!empty($blueskyPost)) {
             // Utiliser le texte accrocheur généré par Claude
-            $text = "📰 {$title}\n\n{$blueskyPost}";
+            $text = $blueskyPost;
         } else {
-            // Fallback: utiliser le résumé tronqué (pour les anciens articles)
+            // Fallback: utiliser le titre + résumé tronqué (pour les anciens articles)
+            $title = $article['title'] ?? 'Article';
             $summary = $article['summary'] ?? '';
             $maxSummaryLength = 200;
             if (mb_strlen($summary) > $maxSummaryLength) {
