@@ -189,18 +189,24 @@ class BlueskyService
     public function formatArticlePost(array $article, string $articleUrl): string
     {
         $title = $article['title'] ?? 'Article';
-        $summary = $article['summary'] ?? '';
 
-        // Limiter le résumé pour rester dans les 300 caractères de Bluesky
-        $maxSummaryLength = 200;
-        if (mb_strlen($summary) > $maxSummaryLength) {
-            $summary = mb_substr($summary, 0, $maxSummaryLength - 3) . '...';
-        }
+        // Utiliser le texte Bluesky personnalisé s'il existe, sinon fallback sur le résumé
+        $blueskyPost = $article['bluesky_post'] ?? '';
 
-        $text = "📰 {$title}";
-
-        if (!empty($summary)) {
-            $text .= "\n\n{$summary}";
+        if (!empty($blueskyPost)) {
+            // Utiliser le texte accrocheur généré par Claude
+            $text = "📰 {$title}\n\n{$blueskyPost}";
+        } else {
+            // Fallback: utiliser le résumé tronqué (pour les anciens articles)
+            $summary = $article['summary'] ?? '';
+            $maxSummaryLength = 200;
+            if (mb_strlen($summary) > $maxSummaryLength) {
+                $summary = mb_substr($summary, 0, $maxSummaryLength - 3) . '...';
+            }
+            $text = "📰 {$title}";
+            if (!empty($summary)) {
+                $text .= "\n\n{$summary}";
+            }
         }
 
         $text .= "\n\n#DroitsHumains #WikiTips";

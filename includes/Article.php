@@ -16,8 +16,8 @@ class Article {
         $slug = $this->generateSlug($data['title']);
 
         $stmt = $this->db->prepare("
-            INSERT INTO articles (title, slug, source_url, source_content, summary, main_points, human_rights_analysis, content, status)
-            VALUES (:title, :slug, :source_url, :source_content, :summary, :main_points, :human_rights_analysis, :content, :status)
+            INSERT INTO articles (title, slug, source_url, source_content, summary, bluesky_post, main_points, human_rights_analysis, content, status)
+            VALUES (:title, :slug, :source_url, :source_content, :summary, :bluesky_post, :main_points, :human_rights_analysis, :content, :status)
         ");
 
         $stmt->execute([
@@ -26,6 +26,7 @@ class Article {
             'source_url' => $data['source_url'] ?? null,
             'source_content' => $data['source_content'] ?? null,
             'summary' => $data['summary'] ?? null,
+            'bluesky_post' => $data['bluesky_post'] ?? null,
             'main_points' => $data['main_points'] ?? null,
             'human_rights_analysis' => $data['human_rights_analysis'] ?? null,
             'content' => $data['content'] ?? null,
@@ -49,7 +50,7 @@ class Article {
         $fields = [];
         $params = ['id' => $id];
 
-        $allowedFields = ['title', 'source_url', 'source_content', 'summary', 'main_points', 'human_rights_analysis', 'content', 'status'];
+        $allowedFields = ['title', 'source_url', 'source_content', 'summary', 'bluesky_post', 'main_points', 'human_rights_analysis', 'content', 'status'];
 
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
