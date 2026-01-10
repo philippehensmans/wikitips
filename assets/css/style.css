@@ -668,6 +668,75 @@ a:hover {
     }
 }
 
+/* Rich Text Editor */
+.rich-editor-wrapper {
+    border: 1px solid var(--wiki-border);
+    border-radius: 2px;
+    background: white;
+}
+
+.rich-editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 8px;
+    background: var(--wiki-bg);
+    border-bottom: 1px solid var(--wiki-border);
+}
+
+.rich-editor-toolbar button {
+    padding: 6px 10px;
+    border: 1px solid var(--wiki-border);
+    border-radius: 2px;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 32px;
+}
+
+.rich-editor-toolbar button:hover {
+    background: var(--wiki-bg-light);
+}
+
+.rich-editor-toolbar button.active {
+    background: var(--wiki-blue);
+    color: white;
+    border-color: var(--wiki-blue-dark);
+}
+
+.rich-editor-toolbar .separator {
+    width: 1px;
+    background: var(--wiki-border);
+    margin: 0 5px;
+}
+
+.rich-editor-content {
+    min-height: 150px;
+    padding: 12px;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.rich-editor-content:focus {
+    box-shadow: inset 0 0 0 2px var(--wiki-blue);
+}
+
+.rich-editor-content p {
+    margin: 0 0 10px 0;
+}
+
+.rich-editor-content p:last-child {
+    margin-bottom: 0;
+}
+
+.rich-editor-content ul,
+.rich-editor-content ol {
+    margin: 10px 0 10px 25px;
+}
+
 /* Print */
 @media print {
     .wiki-sidebar,
