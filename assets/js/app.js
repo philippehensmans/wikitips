@@ -63,3 +63,123 @@ async function analyzeContent(content, sourceUrl = '') {
         source_url: sourceUrl
     });
 }
+
+/**
+ * Éditeur de texte riche simple
+ */
+class RichEditor {
+    constructor(textarea) {
+        this.textarea = textarea;
+        this.createEditor();
+    }
+
+    createEditor() {
+        // Créer le wrapper
+        this.wrapper = document.createElement('div');
+        this.wrapper.className = 'rich-editor-wrapper';
+
+        // Créer la barre d'outils
+        this.toolbar = document.createElement('div');
+        this.toolbar.className = 'rich-editor-toolbar';
+
+        const buttons = [
+            { cmd: 'bold', icon: 'B', title: 'Gras (Ctrl+B)' },
+            { cmd: 'italic', icon: 'I', title: 'Italique (Ctrl+I)' },
+            { cmd: 'underline', icon: 'U', title: 'Souligné (Ctrl+U)' },
+            { type: 'separator' },
+            { cmd: 'insertUnorderedList', icon: '•', title: 'Liste à puces' },
+            { cmd: 'insertOrderedList', icon: '1.', title: 'Liste numérotée' },
+        ];
+
+        buttons.forEach(btn => {
+            if (btn.type === 'separator') {
+                const sep = document.createElement('span');
+                sep.className = 'separator';
+                this.toolbar.appendChild(sep);
+            } else {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.innerHTML = btn.icon;
+                button.title = btn.title;
+                button.style.fontStyle = btn.cmd === 'italic' ? 'italic' : 'normal';
+                button.style.textDecoration = btn.cmd === 'underline' ? 'underline' : 'none';
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.execCommand(btn.cmd);
+                });
+                this.toolbar.appendChild(button);
+            }
+        });
+
+        // Créer la zone d'édition
+        this.content = document.createElement('div');
+        this.content.className = 'rich-editor-content';
+        this.content.contentEditable = true;
+        this.content.innerHTML = this.textarea.value || '<p><br></p>';
+
+        // Assembler
+        this.wrapper.appendChild(this.toolbar);
+        this.wrapper.appendChild(this.content);
+
+        // Remplacer le textarea
+        this.textarea.style.display = 'none';
+        this.textarea.parentNode.insertBefore(this.wrapper, this.textarea.nextSibling);
+
+        // Événements
+        this.content.addEventListener('input', () => this.syncToTextarea());
+        this.content.addEventListener('keydown', (e) => this.handleKeydown(e));
+
+        // Synchroniser au chargement
+        this.syncToTextarea();
+    }
+
+    execCommand(cmd, value = null) {
+        this.content.focus();
+        document.execCommand(cmd, false, value);
+        this.syncToTextarea();
+    }
+
+    handleKeydown(e) {
+        // Raccourcis clavier
+        if (e.ctrlKey || e.metaKey) {
+            switch (e.key.toLowerCase()) {
+                case 'b':
+                    e.preventDefault();
+                    this.execCommand('bold');
+                    break;
+                case 'i':
+                    e.preventDefault();
+                    this.execCommand('italic');
+                    break;
+                case 'u':
+                    e.preventDefault();
+                    this.execCommand('underline');
+                    break;
+            }
+        }
+    }
+
+    syncToTextarea() {
+        this.textarea.value = this.content.innerHTML;
+    }
+
+    setContent(html) {
+        this.content.innerHTML = html || '<p><br></p>';
+        this.syncToTextarea();
+    }
+}
+
+/**
+ * Initialise les éditeurs riches sur les éléments avec la classe 'rich-editor'
+ */
+function initRichEditors() {
+    document.querySelectorAll('textarea.rich-editor').forEach(textarea => {
+        if (!textarea.dataset.richEditorInit) {
+            new RichEditor(textarea);
+            textarea.dataset.richEditorInit = 'true';
+        }
+    });
+}
+
+// Initialiser au chargement de la page
+document.addEventListener('DOMContentLoaded', initRichEditors);
