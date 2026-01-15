@@ -257,4 +257,159 @@ PROMPT;
 
         return $html;
     }
+
+    /**
+     * Générer une recension (article PHH) à partir d'un article existant
+     * Format: 4000 signes (espaces non compris), titre, chapô, intertitres, hashtags
+     */
+    public function generateReview(array $article): array {
+        $prompt = $this->buildReviewPrompt($article);
+
+        $response = $this->callApi($prompt);
+
+        if (isset($response['error'])) {
+            return ['error' => $response['error']];
+        }
+
+        return $this->parseReviewResponse($response);
+    }
+
+    /**
+     * Construire le prompt pour la génération de recension
+     */
+    private function buildReviewPrompt(array $article): string {
+        $title = $article['title'] ?? '';
+        $summary = $article['summary'] ?? '';
+        $mainPoints = strip_tags($article['main_points'] ?? '');
+        $humanRightsAnalysis = strip_tags($article['human_rights_analysis'] ?? '');
+        $sourceUrl = $article['source_url'] ?? '';
+        $content = $article['content'] ?? '';
+
+        $sourceReference = '';
+        if (!empty($sourceUrl)) {
+            $sourceReference = "\n\nIMPORTANT: L'article fait référence à cette source: $sourceUrl - Tu dois mentionner cette référence dans ton texte de manière naturelle.";
+        }
+
+        return <<<PROMPT
+Tu es un rédacteur expert pour une publication sur les droits humains (PHH - Publication sur les droits Humains et Humanitaires). Tu dois rédiger une RECENSION à partir des informations suivantes.
+
+TITRE DE L'ARTICLE: $title
+
+RÉSUMÉ: $summary
+
+POINTS PRINCIPAUX: $mainPoints
+
+ANALYSE DROITS HUMAINS: $humanRightsAnalysis
+
+CONTENU ADDITIONNEL: $content
+$sourceReference
+
+---
+
+CONSIGNES STRICTES:
+
+1. LONGUEUR: Exactement 4000 signes (caractères) ESPACES NON COMPRIS. Compte précisément les caractères sans les espaces.
+
+2. STRUCTURE OBLIGATOIRE:
+   - Un TITRE accrocheur et informatif (différent du titre original)
+   - Un CHAPÔ (introduction de 2-3 phrases qui accroche le lecteur)
+   - 3-4 INTERTITRES pour structurer le texte
+   - Des paragraphes fluides et bien articulés sous chaque intertitre
+   - 5-7 HASHTAGS pertinents à la fin
+
+3. STYLE:
+   - Ton journalistique engagé mais factuel
+   - Vocabulaire accessible mais précis
+   - Phrases percutantes
+   - Mise en contexte des enjeux droits humains
+
+4. RÉFÉRENCE SOURCE: Si une URL source est fournie, l'intégrer naturellement dans le texte (ex: "comme le rapporte [nom du média]" ou "selon l'article publié sur [site]")
+
+Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans ```json) contenant exactement cette structure:
+
+{
+    "titre": "Le titre de la recension",
+    "chapo": "Le chapô accrocheur de 2-3 phrases",
+    "sections": [
+        {
+            "intertitre": "Premier intertitre",
+            "contenu": "Contenu du premier paragraphe..."
+        },
+        {
+            "intertitre": "Deuxième intertitre",
+            "contenu": "Contenu du deuxième paragraphe..."
+        },
+        {
+            "intertitre": "Troisième intertitre",
+            "contenu": "Contenu du troisième paragraphe..."
+        }
+    ],
+    "hashtags": ["#DroitsHumains", "#Justice", "#Humanitaire", "..."],
+    "nombre_signes_hors_espaces": 4000
+}
+
+Assure-toi que le JSON est valide et que le nombre total de signes (hors espaces) est d'environ 4000.
+PROMPT;
+    }
+
+    /**
+     * Parser la réponse de génération de recension
+     */
+    private function parseReviewResponse(array $response): array {
+        if (!isset($response['text'])) {
+            return ['error' => 'Réponse vide'];
+        }
+
+        $text = trim($response['text']);
+
+        // Nettoyer le JSON si nécessaire
+        $text = preg_replace('/^```json\s*/', '', $text);
+        $text = preg_replace('/\s*```$/', '', $text);
+
+        $data = json_decode($text, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return ['error' => 'Erreur de parsing JSON: ' . json_last_error_msg(), 'raw' => $text];
+        }
+
+        // Formater en HTML pour l'affichage
+        $html = '<div class="review-content">';
+
+        // Chapô
+        $html .= '<p class="review-chapo"><strong>' . htmlspecialchars($data['chapo'] ?? '') . '</strong></p>';
+
+        // Sections avec intertitres
+        foreach ($data['sections'] ?? [] as $section) {
+            $html .= '<h3 class="review-intertitre">' . htmlspecialchars($section['intertitre'] ?? '') . '</h3>';
+            $html .= '<p>' . htmlspecialchars($section['contenu'] ?? '') . '</p>';
+        }
+
+        // Hashtags
+        if (!empty($data['hashtags'])) {
+            $html .= '<p class="review-hashtags">' . htmlspecialchars(implode(' ', $data['hashtags'])) . '</p>';
+        }
+
+        $html .= '</div>';
+
+        // Texte brut pour copier-coller
+        $plainText = $data['titre'] . "\n\n";
+        $plainText .= $data['chapo'] . "\n\n";
+        foreach ($data['sections'] ?? [] as $section) {
+            $plainText .= "## " . $section['intertitre'] . "\n\n";
+            $plainText .= $section['contenu'] . "\n\n";
+        }
+        if (!empty($data['hashtags'])) {
+            $plainText .= implode(' ', $data['hashtags']);
+        }
+
+        return [
+            'titre' => $data['titre'] ?? 'Sans titre',
+            'chapo' => $data['chapo'] ?? '',
+            'sections' => $data['sections'] ?? [],
+            'hashtags' => $data['hashtags'] ?? [],
+            'nombre_signes' => $data['nombre_signes_hors_espaces'] ?? 0,
+            'html' => $html,
+            'plain_text' => $plainText
+        ];
+    }
 }

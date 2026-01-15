@@ -150,7 +150,95 @@ ob_start();
 </div>
 <?php endif; ?>
 
+<!-- Section Intelligence Artificielle -->
+<div class="ai-section">
+    <h2>🤖 Intelligence Artificielle</h2>
+    <p class="ai-description">Générez automatiquement une recension (article PHH) de 4000 signes avec titre, chapô, intertitres et hashtags.</p>
+
+    <button type="button" class="btn btn-ai" id="generateReviewBtn" onclick="generateReview(<?= $article['id'] ?>)">
+        ✨ Générer une recension PHH
+    </button>
+
+    <div id="reviewResult" class="review-result" style="display: none;">
+        <div class="review-header">
+            <h3 id="reviewTitle"></h3>
+            <div class="review-meta">
+                <span id="reviewCharCount"></span>
+                <button type="button" class="btn btn-small" onclick="copyReviewToClipboard()">📋 Copier</button>
+            </div>
+        </div>
+        <div id="reviewContent"></div>
+    </div>
+
+    <div id="reviewError" class="error-message" style="display: none;"></div>
+</div>
+
 <script>
+async function generateReview(articleId) {
+    const btn = document.getElementById('generateReviewBtn');
+    const resultDiv = document.getElementById('reviewResult');
+    const errorDiv = document.getElementById('reviewError');
+
+    // Masquer les résultats précédents
+    resultDiv.style.display = 'none';
+    errorDiv.style.display = 'none';
+
+    // Désactiver le bouton et afficher le chargement
+    btn.disabled = true;
+    btn.textContent = '⏳ Génération en cours...';
+
+    try {
+        const response = await fetch('<?= url('api/index.php?action=generate-review') ?>/' + articleId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.data) {
+            // Afficher le résultat
+            document.getElementById('reviewTitle').textContent = data.data.titre;
+            document.getElementById('reviewCharCount').textContent = '~' + data.data.nombre_signes + ' signes (hors espaces)';
+            document.getElementById('reviewContent').innerHTML = data.data.html;
+
+            // Stocker le texte brut pour la copie
+            resultDiv.dataset.plainText = data.data.plain_text;
+
+            resultDiv.style.display = 'block';
+        } else {
+            errorDiv.textContent = '✗ Erreur : ' + (data.message || 'Erreur inconnue');
+            errorDiv.style.display = 'block';
+        }
+    } catch (error) {
+        errorDiv.textContent = '✗ Erreur de connexion : ' + error.message;
+        errorDiv.style.display = 'block';
+    } finally {
+        // Réactiver le bouton
+        btn.disabled = false;
+        btn.textContent = '✨ Générer une recension PHH';
+    }
+}
+
+function copyReviewToClipboard() {
+    const resultDiv = document.getElementById('reviewResult');
+    const plainText = resultDiv.dataset.plainText;
+
+    navigator.clipboard.writeText(plainText).then(() => {
+        alert('Recension copiée dans le presse-papiers !');
+    }).catch(err => {
+        // Fallback pour les navigateurs sans clipboard API
+        const textarea = document.createElement('textarea');
+        textarea.value = plainText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Recension copiée dans le presse-papiers !');
+    });
+}
+
 function confirmDelete(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
         fetch('<?= url('api/index.php?action=articles') ?>' + '/' + id, { method: 'DELETE' })
