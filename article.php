@@ -120,6 +120,65 @@ ob_start();
 </div>
 <?php endif; ?>
 
+<?php
+// Génération automatique de la recension si elle n'existe pas
+$reviewData = null;
+$reviewError = null;
+
+if (empty($article['review_phh'])) {
+    // Vérifier que Claude API est configuré
+    if (CLAUDE_API_KEY !== 'YOUR_API_KEY_HERE') {
+        $claude = new ClaudeService();
+        $result = $claude->generateReview($article);
+
+        if (isset($result['error'])) {
+            $reviewError = $result['error'];
+        } else {
+            // Stocker la recension en base de données
+            $reviewData = $result;
+            $articleModel->update($article['id'], [
+                'review_phh' => json_encode($result)
+            ]);
+        }
+    }
+} else {
+    // Charger la recension existante
+    $reviewData = json_decode($article['review_phh'], true);
+}
+
+if ($reviewData): ?>
+<div class="article-section">
+    <h2>Recension</h2>
+    <div class="review-header">
+        <h3><?= htmlspecialchars($reviewData['titre'] ?? 'Sans titre') ?></h3>
+        <div class="review-meta">
+            <span>~<?= $reviewData['nombre_signes'] ?? 4000 ?> signes (hors espaces)</span>
+            <button type="button" class="btn btn-small" onclick="copyReviewToClipboard()">📋 Copier</button>
+        </div>
+    </div>
+    <div class="review-content">
+        <p class="review-chapo"><strong><?= htmlspecialchars($reviewData['chapo'] ?? '') ?></strong></p>
+        <?php foreach ($reviewData['sections'] ?? [] as $section): ?>
+        <h3 class="review-intertitre"><?= htmlspecialchars($section['intertitre'] ?? '') ?></h3>
+        <p><?= htmlspecialchars($section['contenu'] ?? '') ?></p>
+        <?php endforeach; ?>
+        <?php if (!empty($article['source_url'])): ?>
+        <p class="review-source"><strong>Source :</strong> <a href="<?= htmlspecialchars($article['source_url']) ?>" target="_blank"><?= htmlspecialchars($article['source_url']) ?></a></p>
+        <?php endif; ?>
+        <?php if (!empty($reviewData['hashtags'])): ?>
+        <p class="review-hashtags"><?= htmlspecialchars(implode(' ', $reviewData['hashtags'])) ?></p>
+        <?php endif; ?>
+    </div>
+</div>
+<?php elseif ($reviewError): ?>
+<div class="article-section">
+    <h2>Recension</h2>
+    <div class="error-message">
+        ✗ Erreur lors de la génération : <?= htmlspecialchars($reviewError) ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php if ($article['main_points']): ?>
 <div class="article-section">
     <h2>Points principaux</h2>
@@ -150,127 +209,9 @@ ob_start();
 </div>
 <?php endif; ?>
 
-<?php
-// Génération automatique de la recension si elle n'existe pas
-$reviewData = null;
-$reviewError = null;
-
-if (empty($article['review_phh'])) {
-    // Vérifier que Claude API est configuré
-    if (CLAUDE_API_KEY !== 'YOUR_API_KEY_HERE') {
-        $claude = new ClaudeService();
-        $result = $claude->generateReview($article);
-
-        if (isset($result['error'])) {
-            $reviewError = $result['error'];
-        } else {
-            // Stocker la recension en base de données
-            $reviewData = $result;
-            $articleModel->update($article['id'], [
-                'review_phh' => json_encode($result)
-            ]);
-        }
-    }
-} else {
-    // Charger la recension existante
-    $reviewData = json_decode($article['review_phh'], true);
-}
-?>
-
-<!-- Section Recension -->
-<div class="ai-section">
-    <h2>📝 Recension</h2>
-
-    <?php if ($reviewData): ?>
-    <div id="reviewResult" class="review-result">
-        <div class="review-header">
-            <h3 id="reviewTitle"><?= htmlspecialchars($reviewData['titre'] ?? 'Sans titre') ?></h3>
-            <div class="review-meta">
-                <span id="reviewCharCount">~<?= $reviewData['nombre_signes'] ?? 4000 ?> signes (hors espaces)</span>
-                <button type="button" class="btn btn-small" onclick="copyReviewToClipboard()">📋 Copier</button>
-                <button type="button" class="btn btn-small" onclick="regenerateReview(<?= $article['id'] ?>)" id="regenerateBtn">🔄 Régénérer</button>
-            </div>
-        </div>
-        <div id="reviewContent">
-            <div class="review-content">
-                <p class="review-chapo"><strong><?= htmlspecialchars($reviewData['chapo'] ?? '') ?></strong></p>
-                <?php foreach ($reviewData['sections'] ?? [] as $section): ?>
-                <h3 class="review-intertitre"><?= htmlspecialchars($section['intertitre'] ?? '') ?></h3>
-                <p><?= htmlspecialchars($section['contenu'] ?? '') ?></p>
-                <?php endforeach; ?>
-                <?php if (!empty($article['source_url'])): ?>
-                <p class="review-source"><strong>Source :</strong> <a href="<?= htmlspecialchars($article['source_url']) ?>" target="_blank"><?= htmlspecialchars($article['source_url']) ?></a></p>
-                <?php endif; ?>
-                <?php if (!empty($reviewData['hashtags'])): ?>
-                <p class="review-hashtags"><?= htmlspecialchars(implode(' ', $reviewData['hashtags'])) ?></p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-    <?php elseif ($reviewError): ?>
-    <div class="error-message">
-        ✗ Erreur lors de la génération : <?= htmlspecialchars($reviewError) ?>
-    </div>
-    <button type="button" class="btn btn-ai" onclick="regenerateReview(<?= $article['id'] ?>)" id="regenerateBtn">
-        🔄 Réessayer la génération
-    </button>
-    <?php else: ?>
-    <p class="ai-description">La clé API Claude n'est pas configurée. Configurez-la dans config.php pour générer automatiquement les recensions.</p>
-    <?php endif; ?>
-
-    <div id="reviewError" class="error-message" style="display: none;"></div>
-</div>
-
 <script>
-// Données pour la copie
+// Données pour la copie de la recension
 const reviewPlainText = <?= json_encode($reviewData ? ($reviewData['plain_text'] ?? '') : '') ?>;
-
-async function regenerateReview(articleId) {
-    const btn = document.getElementById('regenerateBtn');
-    const resultDiv = document.getElementById('reviewResult');
-    const errorDiv = document.getElementById('reviewError');
-
-    // Masquer les erreurs précédentes
-    if (errorDiv) errorDiv.style.display = 'none';
-
-    // Désactiver le bouton et afficher le chargement
-    if (btn) {
-        btn.disabled = true;
-        btn.textContent = '⏳ Régénération...';
-    }
-
-    try {
-        const response = await fetch('<?= url('api/index.php?action=generate-review') ?>/' + articleId, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        const data = await response.json();
-
-        if (data.success && data.data) {
-            // Recharger la page pour afficher la nouvelle recension
-            window.location.reload();
-        } else {
-            if (errorDiv) {
-                errorDiv.textContent = '✗ Erreur : ' + (data.message || 'Erreur inconnue');
-                errorDiv.style.display = 'block';
-            }
-        }
-    } catch (error) {
-        if (errorDiv) {
-            errorDiv.textContent = '✗ Erreur de connexion : ' + error.message;
-            errorDiv.style.display = 'block';
-        }
-    } finally {
-        // Réactiver le bouton
-        if (btn) {
-            btn.disabled = false;
-            btn.textContent = '🔄 Régénérer';
-        }
-    }
-}
 
 function copyReviewToClipboard() {
     navigator.clipboard.writeText(reviewPlainText).then(() => {
