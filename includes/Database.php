@@ -62,6 +62,9 @@ class Database {
         // Migration: Ajouter la colonne bluesky_post si elle n'existe pas
         $this->addColumnIfNotExists('articles', 'bluesky_post', 'TEXT');
 
+        // Migration: Ajouter la colonne review_phh pour stocker la recension générée
+        $this->addColumnIfNotExists('articles', 'review_phh', 'TEXT');
+
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
