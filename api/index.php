@@ -272,5 +272,10 @@ function handleGenerateReview(string $method, ?string $id): array {
         return ['error' => true, 'message' => $result['error']];
     }
 
+    // Sauvegarder la recension en base de données
+    $article->update((int)$id, [
+        'review_phh' => json_encode($result)
+    ]);
+
     return ['success' => true, 'data' => $result];
 }

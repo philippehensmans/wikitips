@@ -50,7 +50,7 @@ class Article {
         $fields = [];
         $params = ['id' => $id];
 
-        $allowedFields = ['title', 'source_url', 'source_content', 'summary', 'bluesky_post', 'main_points', 'human_rights_analysis', 'content', 'status'];
+        $allowedFields = ['title', 'source_url', 'source_content', 'summary', 'bluesky_post', 'main_points', 'human_rights_analysis', 'content', 'status', 'review_phh'];
 
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
