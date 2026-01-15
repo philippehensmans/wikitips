@@ -89,6 +89,8 @@ class RichEditor {
             { type: 'separator' },
             { cmd: 'insertUnorderedList', icon: '•', title: 'Liste à puces' },
             { cmd: 'insertOrderedList', icon: '1.', title: 'Liste numérotée' },
+            { type: 'separator' },
+            { cmd: 'insertTable', icon: '▦', title: 'Insérer un tableau', custom: true },
         ];
 
         buttons.forEach(btn => {
@@ -105,7 +107,11 @@ class RichEditor {
                 button.style.textDecoration = btn.cmd === 'underline' ? 'underline' : 'none';
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
-                    this.execCommand(btn.cmd);
+                    if (btn.custom) {
+                        this.handleCustomCommand(btn.cmd);
+                    } else {
+                        this.execCommand(btn.cmd);
+                    }
                 });
                 this.toolbar.appendChild(button);
             }
@@ -136,6 +142,42 @@ class RichEditor {
     execCommand(cmd, value = null) {
         this.content.focus();
         document.execCommand(cmd, false, value);
+        this.syncToTextarea();
+    }
+
+    handleCustomCommand(cmd) {
+        switch (cmd) {
+            case 'insertTable':
+                this.insertTable();
+                break;
+        }
+    }
+
+    insertTable() {
+        const rows = prompt('Nombre de lignes :', '3');
+        if (!rows) return;
+        const cols = prompt('Nombre de colonnes :', '3');
+        if (!cols) return;
+
+        const numRows = parseInt(rows, 10) || 3;
+        const numCols = parseInt(cols, 10) || 3;
+
+        let html = '<table><thead><tr>';
+        for (let c = 0; c < numCols; c++) {
+            html += '<th>En-tête</th>';
+        }
+        html += '</tr></thead><tbody>';
+        for (let r = 0; r < numRows - 1; r++) {
+            html += '<tr>';
+            for (let c = 0; c < numCols; c++) {
+                html += '<td>Cellule</td>';
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table><p><br></p>';
+
+        this.content.focus();
+        document.execCommand('insertHTML', false, html);
         this.syncToTextarea();
     }
 

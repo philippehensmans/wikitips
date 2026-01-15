@@ -737,6 +737,28 @@ a:hover {
     margin: 10px 0 10px 25px;
 }
 
+.rich-editor-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.rich-editor-content table th,
+.rich-editor-content table td {
+    border: 1px solid var(--wiki-border);
+    padding: 8px;
+    text-align: left;
+}
+
+.rich-editor-content table th {
+    background: var(--wiki-bg);
+    font-weight: bold;
+}
+
+.rich-editor-content table tr:nth-child(even) {
+    background: var(--wiki-bg-light);
+}
+
 /* Print */
 @media print {
     .wiki-sidebar,
