@@ -7,24 +7,37 @@ RewriteEngine On
 RewriteCond %{REQUEST_URI} ^/api/
 RewriteRule ^api/(.*)$ api/index.php [L,QSA]
 
-# Empêcher l'accès aux fichiers sensibles
-<FilesMatch "(^\.|\.(php|sqlite|db)$)">
-    # Autoriser les fichiers PHP publics
-</FilesMatch>
-
-# Protéger le dossier data
-<IfModule mod_authz_core.c>
-    <Directory "data">
-        Require all denied
-    </Directory>
-</IfModule>
-
 # Protéger les fichiers de configuration
 <Files "config.php">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
 </Files>
+
+<Files "config.local.php">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>
+
+# Protéger les fichiers SQLite
+<FilesMatch "\.(sqlite|db)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
 
 # Types MIME
 AddType application/json .json
