@@ -65,6 +65,9 @@ function handleRequest(string $method, array $segments, array $input): array {
         case 'analyze':
             return handleAnalyze($method, $input);
 
+        case 'generate-review':
+            return handleGenerateReview($method, $id);
+
         case 'health':
             return ['status' => 'ok', 'timestamp' => date('c')];
 
@@ -228,6 +231,45 @@ function handleAnalyze(string $method, array $input): array {
 
         $result['article_id'] = $articleId;
         $result['article_created'] = true;
+    }
+
+    return ['success' => true, 'data' => $result];
+}
+
+/**
+ * Générer une recension (article PHH) à partir d'un article existant
+ */
+function handleGenerateReview(string $method, ?string $id): array {
+    if ($method !== 'POST') {
+        http_response_code(405);
+        return ['error' => true, 'message' => 'Méthode non autorisée'];
+    }
+
+    if (!$id || !is_numeric($id)) {
+        http_response_code(400);
+        return ['error' => true, 'message' => 'ID d\'article requis'];
+    }
+
+    // Vérifier que la clé API Claude est configurée
+    if (CLAUDE_API_KEY === 'YOUR_API_KEY_HERE') {
+        http_response_code(500);
+        return ['error' => true, 'message' => 'La clé API Claude n\'est pas configurée'];
+    }
+
+    $article = new Article();
+    $articleData = $article->getById((int)$id);
+
+    if (!$articleData) {
+        http_response_code(404);
+        return ['error' => true, 'message' => 'Article non trouvé'];
+    }
+
+    $claude = new ClaudeService();
+    $result = $claude->generateReview($articleData);
+
+    if (isset($result['error'])) {
+        http_response_code(500);
+        return ['error' => true, 'message' => $result['error']];
     }
 
     return ['success' => true, 'data' => $result];
