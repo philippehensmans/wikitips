@@ -115,5 +115,23 @@
     </footer>
 
     <script src="<?= url('assets/js/app.js') ?>?v=<?= time() ?>"></script>
+
+    <?php if (defined('MATOMO_URL') && MATOMO_URL && defined('MATOMO_SITE_ID') && MATOMO_SITE_ID): ?>
+    <!-- Matomo -->
+    <script>
+      var _paq = window._paq = window._paq || [];
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u="<?= rtrim(MATOMO_URL, '/') ?>/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '<?= MATOMO_SITE_ID ?>']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <noscript><p><img referrerpolicy="no-referrer-when-downgrade" src="<?= rtrim(MATOMO_URL, '/') ?>/matomo.php?idsite=<?= MATOMO_SITE_ID ?>&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+    <!-- End Matomo Code -->
+    <?php endif; ?>
 </body>
 </html>

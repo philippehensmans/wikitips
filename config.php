@@ -58,6 +58,15 @@ if (!defined('BLUESKY_AUTO_SHARE')) {
     define('BLUESKY_AUTO_SHARE', false); // Partage automatique à la création d'article
 }
 
+// Configuration Matomo (Analytics)
+// Obtenez ces informations depuis votre instance Matomo
+if (!defined('MATOMO_URL')) {
+    define('MATOMO_URL', ''); // URL de votre instance Matomo (ex: https://analytics.example.com/)
+}
+if (!defined('MATOMO_SITE_ID')) {
+    define('MATOMO_SITE_ID', ''); // ID du site dans Matomo
+}
+
 // Chemin de base (auto-détecté ou défini manuellement)
 // Ex: si installé dans /wikitips/, définir BASE_PATH = '/wikitips'
 if (!defined('BASE_PATH')) {

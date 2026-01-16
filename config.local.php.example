@@ -23,3 +23,12 @@ define('SITE_URL', 'https://votre-domaine.com');
 // Nom et description du site (optionnel)
 // define('SITE_NAME', 'WikiTips - Mon Site');
 // define('SITE_DESCRIPTION', 'Ma description personnalisée');
+
+// Configuration Bluesky (optionnel)
+// Créez un App Password sur https://bsky.app/settings/app-passwords
+// define('BLUESKY_IDENTIFIER', 'votre-handle.bsky.social');
+// define('BLUESKY_APP_PASSWORD', 'xxxx-xxxx-xxxx-xxxx');
+
+// Configuration Matomo Analytics (optionnel)
+// define('MATOMO_URL', 'https://analytics.votre-domaine.com/');
+// define('MATOMO_SITE_ID', '1');
