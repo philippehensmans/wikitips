@@ -335,13 +335,22 @@ function handleUpload(string $method): array {
     }
 
     // Générer un nom de fichier unique
-    $extension = match($mimeType) {
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/gif' => 'gif',
-        'image/webp' => 'webp',
-        default => 'jpg'
-    };
+    switch ($mimeType) {
+        case 'image/jpeg':
+            $extension = 'jpg';
+            break;
+        case 'image/png':
+            $extension = 'png';
+            break;
+        case 'image/gif':
+            $extension = 'gif';
+            break;
+        case 'image/webp':
+            $extension = 'webp';
+            break;
+        default:
+            $extension = 'jpg';
+    }
 
     $filename = date('Y-m-d_His_') . bin2hex(random_bytes(8)) . '.' . $extension;
     $uploadDir = __DIR__ . '/../uploads/';
