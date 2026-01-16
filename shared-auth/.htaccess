@@ -1,4 +1,4 @@
-# Protect data directory - deny all access
+# Protect shared-auth directory from direct web access
 # Compatible with Apache 2.2 and 2.4
 
 <IfModule mod_authz_core.c>

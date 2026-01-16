@@ -31,3 +31,8 @@ Thumbs.db
 # Extension Chrome packagée
 *.crx
 *.pem
+
+# Uploads (keep .htaccess)
+/uploads/*
+!/uploads/.htaccess
+!/uploads/index.php
