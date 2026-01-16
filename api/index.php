@@ -68,6 +68,9 @@ function handleRequest(string $method, array $segments, array $input): array {
         case 'generate-review':
             return handleGenerateReview($method, $id);
 
+        case 'upload':
+            return handleUpload($method);
+
         case 'health':
             return ['status' => 'ok', 'timestamp' => date('c')];
 
@@ -278,4 +281,85 @@ function handleGenerateReview(string $method, ?string $id): array {
     ]);
 
     return ['success' => true, 'data' => $result];
+}
+
+/**
+ * Gérer l'upload d'images (pour TinyMCE)
+ */
+function handleUpload(string $method): array {
+    if ($method !== 'POST') {
+        http_response_code(405);
+        return ['error' => true, 'message' => 'Méthode non autorisée'];
+    }
+
+    // Vérifier l'authentification (session)
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (empty($_SESSION['user_id'])) {
+        http_response_code(401);
+        return ['error' => true, 'message' => 'Authentification requise'];
+    }
+
+    // Vérifier qu'un fichier a été uploadé
+    if (empty($_FILES['file'])) {
+        http_response_code(400);
+        return ['error' => true, 'message' => 'Aucun fichier uploadé'];
+    }
+
+    $file = $_FILES['file'];
+
+    // Vérifier les erreurs d'upload
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        http_response_code(400);
+        return ['error' => true, 'message' => 'Erreur lors de l\'upload: ' . $file['error']];
+    }
+
+    // Vérifier le type MIME
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+
+    if (!in_array($mimeType, $allowedTypes)) {
+        http_response_code(400);
+        return ['error' => true, 'message' => 'Type de fichier non autorisé. Formats acceptés: JPG, PNG, GIF, WebP'];
+    }
+
+    // Vérifier la taille (max 5 Mo)
+    $maxSize = 5 * 1024 * 1024;
+    if ($file['size'] > $maxSize) {
+        http_response_code(400);
+        return ['error' => true, 'message' => 'Fichier trop volumineux (max 5 Mo)'];
+    }
+
+    // Générer un nom de fichier unique
+    $extension = match($mimeType) {
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif',
+        'image/webp' => 'webp',
+        default => 'jpg'
+    };
+
+    $filename = date('Y-m-d_His_') . bin2hex(random_bytes(8)) . '.' . $extension;
+    $uploadDir = __DIR__ . '/../uploads/';
+    $uploadPath = $uploadDir . $filename;
+
+    // Créer le dossier si nécessaire
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+
+    // Déplacer le fichier
+    if (!move_uploaded_file($file['tmp_name'], $uploadPath)) {
+        http_response_code(500);
+        return ['error' => true, 'message' => 'Erreur lors de la sauvegarde du fichier'];
+    }
+
+    // Retourner l'URL de l'image (format TinyMCE)
+    $imageUrl = url('uploads/' . $filename);
+
+    return ['location' => $imageUrl];
 }

@@ -196,7 +196,7 @@ if ($reviewData): ?>
 <?php if ($article['content']): ?>
 <div class="article-section">
     <h2>Contenu</h2>
-    <?= nl2br(htmlspecialchars($article['content'])) ?>
+    <div class="article-content"><?= $article['content'] ?></div>
 </div>
 <?php endif; ?>
 
