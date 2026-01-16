@@ -61,13 +61,14 @@
 | Résumé automatique | Synthèse du contenu en quelques phrases |
 | Extraction des points clés | Liste des informations principales |
 | Analyse droits humains | Évaluation selon les conventions internationales |
+| Recension automatique | Génération d'une recension journalistique structurée |
 | Recommandations | Suggestions d'actions ou de réflexions |
 
 ### Utilisateurs
 
 | Fonctionnalité | Description |
 |----------------|-------------|
-| Inscription | Création de compte avec validation |
+| Gestion des comptes | Création par les administrateurs uniquement |
 | Connexion sécurisée | Sessions PHP avec hash bcrypt |
 | Profil utilisateur | Modification des informations personnelles |
 | Rôles | Administrateur et éditeur |
@@ -80,12 +81,13 @@
 | Menu contextuel | Clic droit pour analyser |
 | Envoi direct | Transfert vers WikiTips en un clic |
 
-### Partage social (Bluesky)
+### Partage social
 
 | Fonctionnalité | Description |
 |----------------|-------------|
-| Partage manuel | Bouton pour partager un article sur Bluesky |
-| Partage automatique | Option pour publier automatiquement à la création |
+| Partage WhatsApp | Bouton pour partager un article via WhatsApp |
+| Partage Bluesky | Bouton pour partager un article sur Bluesky |
+| Partage automatique | Option pour publier automatiquement à la création (Bluesky) |
 | Personnalisation | Texte du post modifiable avant envoi |
 | Carte de lien | Aperçu riche avec titre et description |
 
@@ -111,17 +113,24 @@ wikitips/
 │
 ├── config.php                 # Configuration principale
 ├── config.local.php           # Configuration locale (à créer)
+├── .htaccess                  # Configuration Apache
 │
 ├── index.php                  # Page d'accueil
 ├── article.php                # Affichage d'un article
-├── create.php                 # Création d'article
+├── articles.php               # Liste des articles
+├── new.php                    # Création d'article
 ├── edit.php                   # Modification d'article
+├── import.php                 # Import d'articles externes
 ├── edit-page.php              # Modification pages statiques
+│
+├── categories.php             # Liste des catégories
+├── category.php               # Affichage d'une catégorie
+├── search.php                 # Recherche d'articles
 │
 ├── login.php                  # Page de connexion
 ├── logout.php                 # Déconnexion
-├── register.php               # Inscription
 ├── profile.php                # Profil utilisateur
+├── users.php                  # Gestion des utilisateurs (admin)
 ├── share-bluesky.php          # Partage sur Bluesky
 │
 ├── includes/
@@ -134,17 +143,20 @@ wikitips/
 │   └── BlueskyService.php     # Intégration Bluesky (AT Protocol)
 │
 ├── api/
-│   ├── index.php              # Routeur API REST
-│   └── .htaccess              # Réécriture URL (Apache)
+│   └── index.php              # Routeur API REST
 │
 ├── templates/
 │   └── layout.php             # Template principal Wikipedia
 │
-├── css/
-│   └── style.css              # Feuille de styles Wikipedia
+├── assets/
+│   ├── css/
+│   │   └── style.css          # Feuille de styles Wikipedia
+│   └── images/
+│       └── favicon.ico        # Icône du site
 │
 ├── data/
-│   └── wikitips.db            # Base de données SQLite (auto-créée)
+│   ├── wikitips.db            # Base de données SQLite (auto-créée)
+│   └── .htaccess              # Protection du dossier
 │
 └── chrome-extension/
     ├── manifest.json          # Configuration extension
@@ -361,14 +373,18 @@ Ce fichier contient vos paramètres spécifiques :
    - Mot de passe : `admin123`
 4. **Important** : Changez immédiatement le mot de passe via **Profil**
 
-#### Créer un compte
+#### Créer un utilisateur (administrateurs uniquement)
 
-1. Cliquez sur **Inscription**
-2. Remplissez le formulaire :
+Il n'y a pas d'inscription publique. Seuls les administrateurs peuvent créer des comptes :
+
+1. Connectez-vous en tant qu'administrateur
+2. Cliquez sur **Gérer les utilisateurs** dans le menu
+3. Remplissez le formulaire de création :
    - Nom d'utilisateur (unique)
    - Adresse email (unique)
-   - Mot de passe (min. 6 caractères)
-3. Les nouveaux comptes ont le rôle **éditeur**
+   - Mot de passe (min. 8 caractères)
+   - Rôle : `editor` ou `admin`
+4. Cliquez sur **Créer l'utilisateur**
 
 #### Modifier son profil
 
@@ -456,6 +472,20 @@ L'analyse Claude examine le contenu sous plusieurs angles :
 4. Les champs sont automatiquement remplis
 5. Vous pouvez modifier le résultat avant d'enregistrer
 
+#### Recension automatique
+
+La recension est une synthèse journalistique générée automatiquement lors de la première consultation d'un article. Elle comprend :
+
+- **Titre** accrocheur
+- **Chapô** (introduction)
+- **Sections** avec intertitres
+- **Hashtags** pour le partage social
+- **Compteur de signes** (environ 4000 signes)
+
+La recension apparaît automatiquement dans la page article, juste après le résumé. Un bouton **Copier** permet de copier le texte pour le réutiliser ailleurs.
+
+> **Note** : La recension est générée une seule fois et stockée en base de données.
+
 ### Administration
 
 #### Modifier la page d'accueil
@@ -468,11 +498,17 @@ L'analyse Claude examine le contenu sous plusieurs angles :
 
 #### Gérer les utilisateurs
 
-La gestion des utilisateurs se fait actuellement en base de données. Pour promouvoir un utilisateur en admin :
+Une interface dédiée permet aux administrateurs de gérer les utilisateurs :
 
-```sql
-UPDATE users SET role = 'admin' WHERE username = 'nom_utilisateur';
-```
+1. Connectez-vous en tant qu'administrateur
+2. Cliquez sur **Gérer les utilisateurs** dans le menu de navigation
+3. Vous pouvez :
+   - **Voir** la liste de tous les utilisateurs
+   - **Créer** de nouveaux comptes (editor ou admin)
+   - **Supprimer** des utilisateurs (sauf vous-même et le dernier admin)
+   - **Changer le mot de passe** d'un utilisateur
+
+> **Note** : Vous ne pouvez pas supprimer votre propre compte ni le dernier administrateur.
 
 ---
 
@@ -865,4 +901,4 @@ WikiTips est distribué sous licence MIT.
 
 ---
 
-*Documentation générée le 7 janvier 2026*
+*Documentation mise à jour le 15 janvier 2026*

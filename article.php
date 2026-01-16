@@ -116,7 +116,7 @@ ob_start();
 <?php if ($article['summary']): ?>
 <div class="article-section">
     <h2>Résumé</h2>
-    <p><?= nl2br(htmlspecialchars($article['summary'])) ?></p>
+    <p><?= nl2br($article['summary']) ?></p>
 </div>
 <?php endif; ?>
 
