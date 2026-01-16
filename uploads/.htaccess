@@ -1,0 +1,12 @@
+# Protection du dossier uploads
+# Autoriser uniquement les fichiers images
+
+# Désactiver l'exécution PHP
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>
+
+# Autoriser uniquement les images
+<FilesMatch "\.(jpg|jpeg|png|gif|webp)$">
+    Require all granted
+</FilesMatch>

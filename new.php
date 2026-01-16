@@ -111,8 +111,8 @@ ob_start();
         </div>
 
         <div class="form-group">
-            <label for="content">Contenu additionnel</label>
-            <textarea id="content" name="content" rows="6"><?= htmlspecialchars($_POST['content'] ?? '') ?></textarea>
+            <label for="content">Contenu</label>
+            <textarea id="content" name="content" class="tinymce-editor"><?= htmlspecialchars($_POST['content'] ?? '') ?></textarea>
         </div>
 
         <div class="form-group">
@@ -152,6 +152,35 @@ ob_start();
         </div>
     </form>
 </div>
+
+<!-- TinyMCE -->
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+tinymce.init({
+    selector: '.tinymce-editor',
+    language: 'fr_FR',
+    height: 400,
+    menubar: false,
+    plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image link | removeformat | code | help',
+    images_upload_url: '<?= url('api/index.php?action=upload') ?>',
+    images_upload_credentials: true,
+    automatic_uploads: true,
+    file_picker_types: 'image',
+    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }',
+    image_caption: true,
+    image_advtab: true,
+    setup: function(editor) {
+        editor.on('change', function() {
+            tinymce.triggerSave();
+        });
+    }
+});
+</script>
 
 <?php
 $content = ob_get_clean();
