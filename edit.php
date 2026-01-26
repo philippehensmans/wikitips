@@ -84,14 +84,14 @@ ob_start();
         </div>
 
         <div class="form-group">
-            <label for="summary">Résumé</label>
-            <textarea id="summary" name="summary" rows="4" class="rich-editor"><?= $article['summary'] ?? '' ?></textarea>
-        </div>
-
-        <div class="form-group">
             <label for="main_points">Points principaux (HTML)</label>
             <textarea id="main_points" name="main_points" rows="6"><?= htmlspecialchars($article['main_points'] ?? '') ?></textarea>
             <p class="help-text">Utilisez des balises &lt;ul&gt;&lt;li&gt; pour la liste des points</p>
+        </div>
+
+        <div class="form-group">
+            <label for="summary">Résumé</label>
+            <textarea id="summary" name="summary" rows="4" class="rich-editor"><?= $article['summary'] ?? '' ?></textarea>
         </div>
 
         <div class="form-group">
