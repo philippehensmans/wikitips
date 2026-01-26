@@ -113,10 +113,17 @@ ob_start();
     </div>
 </div>
 
+<?php if ($article['main_points']): ?>
+<div class="article-section">
+    <h2>Points principaux</h2>
+    <?= $article['main_points'] ?>
+</div>
+<?php endif; ?>
+
 <?php if ($article['summary']): ?>
 <div class="article-section">
     <h2>Résumé</h2>
-    <p><?= nl2br($article['summary']) ?></p>
+    <?= $article['summary'] ?>
 </div>
 <?php endif; ?>
 
@@ -176,13 +183,6 @@ if ($reviewData): ?>
     <div class="error-message">
         ✗ Erreur lors de la génération : <?= htmlspecialchars($reviewError) ?>
     </div>
-</div>
-<?php endif; ?>
-
-<?php if ($article['main_points']): ?>
-<div class="article-section">
-    <h2>Points principaux</h2>
-    <?= $article['main_points'] ?>
 </div>
 <?php endif; ?>
 
