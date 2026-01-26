@@ -153,20 +153,22 @@ ob_start();
     </form>
 </div>
 
-<!-- TinyMCE -->
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- TinyMCE (self-hosted) -->
+<script src="<?= url('assets/js/tinymce/tinymce.min.js') ?>"></script>
 <script>
-// TinyMCE pour le résumé (configuration simplifiée)
+// TinyMCE pour le résumé
 tinymce.init({
     selector: '.tinymce-summary',
     language: 'fr_FR',
-    height: 250,
+    language_url: '<?= url('assets/js/tinymce/langs/fr_FR.js') ?>',
+    height: 300,
     menubar: false,
     plugins: [
-        'autolink', 'lists', 'link', 'charmap',
+        'autolink', 'lists', 'link', 'charmap', 'codesample',
         'searchreplace', 'visualblocks', 'code', 'wordcount'
     ],
-    toolbar: 'undo redo | bold italic underline | bullist numlist | link | removeformat | code',
+    toolbar: 'undo redo | blocks | bold italic underline | bullist numlist | link | codesample code | removeformat',
+    block_formats: 'Paragraphe=p; Titre 1=h1; Titre 2=h2; Titre 3=h3; Préformaté=pre',
     content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.6; }',
     setup: function(editor) {
         editor.on('change', function() {
@@ -179,14 +181,16 @@ tinymce.init({
 tinymce.init({
     selector: '.tinymce-editor',
     language: 'fr_FR',
+    language_url: '<?= url('assets/js/tinymce/langs/fr_FR.js') ?>',
     height: 400,
     menubar: false,
     plugins: [
         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'codesample', 'fullscreen',
         'insertdatetime', 'media', 'table', 'help', 'wordcount'
     ],
-    toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image link | removeformat | code | help',
+    toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image link | codesample code | removeformat | help',
+    block_formats: 'Paragraphe=p; Titre 1=h1; Titre 2=h2; Titre 3=h3; Titre 4=h4; Préformaté=pre',
     images_upload_url: '<?= url('api/index.php?action=upload') ?>',
     images_upload_credentials: true,
     automatic_uploads: true,
