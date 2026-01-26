@@ -42,8 +42,10 @@ $articleUrl .= url('article.php?slug=' . urlencode($article['slug']));
 // Message WhatsApp
 $whatsappText = "📰 " . $article['title'] . "\n\n";
 if (!empty($article['summary'])) {
-    $summaryShort = mb_substr($article['summary'], 0, 150);
-    if (mb_strlen($article['summary']) > 150) {
+    // Supprimer les balises HTML du résumé
+    $summaryClean = strip_tags($article['summary']);
+    $summaryShort = mb_substr($summaryClean, 0, 150);
+    if (mb_strlen($summaryClean) > 150) {
         $summaryShort .= '...';
     }
     $whatsappText .= $summaryShort . "\n\n";
