@@ -91,7 +91,7 @@ ob_start();
 
         <div class="form-group">
             <label for="summary">Résumé</label>
-            <textarea id="summary" name="summary" rows="4" class="rich-editor"><?= $article['summary'] ?? '' ?></textarea>
+            <textarea id="summary" name="summary" rows="4" class="tinymce-summary"><?= $article['summary'] ?? '' ?></textarea>
         </div>
 
         <div class="form-group">
@@ -136,6 +136,26 @@ ob_start();
 <!-- TinyMCE -->
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
+// TinyMCE pour le résumé (configuration simplifiée)
+tinymce.init({
+    selector: '.tinymce-summary',
+    language: 'fr_FR',
+    height: 250,
+    menubar: false,
+    plugins: [
+        'autolink', 'lists', 'link', 'charmap',
+        'searchreplace', 'visualblocks', 'code', 'wordcount'
+    ],
+    toolbar: 'undo redo | bold italic underline | bullist numlist | link | removeformat | code',
+    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.6; }',
+    setup: function(editor) {
+        editor.on('change', function() {
+            tinymce.triggerSave();
+        });
+    }
+});
+
+// TinyMCE pour le contenu (configuration complète)
 tinymce.init({
     selector: '.tinymce-editor',
     language: 'fr_FR',
