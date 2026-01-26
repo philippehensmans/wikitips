@@ -40,7 +40,7 @@ ob_start();
                     <span class="status-badge status-<?= $article['status'] ?>"><?= $article['status'] === 'published' ? 'Publié' : 'Brouillon' ?></span>
                 </h3>
                 <?php if ($article['summary']): ?>
-                    <p class="summary"><?= htmlspecialchars(mb_substr(strip_tags($article['summary']), 0, 250)) ?>...</p>
+                    <p class="summary"><?= htmlspecialchars(mb_substr(html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8'), 0, 250)) ?>...</p>
                 <?php endif; ?>
                 <div class="meta">
                     <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
