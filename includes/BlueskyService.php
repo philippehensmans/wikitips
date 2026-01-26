@@ -197,7 +197,8 @@ class BlueskyService
         } else {
             // Fallback: utiliser le titre + résumé tronqué (pour les anciens articles)
             $title = $article['title'] ?? 'Article';
-            $summary = $article['summary'] ?? '';
+            // Supprimer les balises HTML du résumé
+            $summary = strip_tags($article['summary'] ?? '');
             $maxSummaryLength = 200;
             if (mb_strlen($summary) > $maxSummaryLength) {
                 $summary = mb_substr($summary, 0, $maxSummaryLength - 3) . '...';
@@ -220,7 +221,8 @@ class BlueskyService
     {
         $text = $this->formatArticlePost($article, $articleUrl);
         $title = $article['title'] ?? 'WikiTips';
-        $description = $article['summary'] ?? '';
+        // Supprimer les balises HTML de la description
+        $description = strip_tags($article['summary'] ?? '');
 
         if (mb_strlen($description) > 150) {
             $description = mb_substr($description, 0, 147) . '...';
