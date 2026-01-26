@@ -48,7 +48,7 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans ```json) cont
 
 {
     "title": "Titre proposé pour l'article (concis et informatif)",
-    "summary": "Résumé détaillé et approfondi du contenu en 400-500 mots. Inclure le contexte historique et actuel, les faits principaux avec des détails significatifs, les enjeux à court et long terme, les acteurs impliqués et leurs positions, les implications pour les droits humains, et les perspectives d'évolution. Le résumé doit être suffisamment complet et nuancé pour qu'un lecteur comprenne pleinement le sujet sans lire l'article original.",
+    "summary": "Résumé détaillé et approfondi du contenu en 400-500 mots, STRUCTURÉ EN PLUSIEURS PARAGRAPHES (4-5 paragraphes séparés par des doubles retours à la ligne). Chaque paragraphe doit aborder un aspect différent: 1) le contexte historique et actuel, 2) les faits principaux avec des détails significatifs, 3) les acteurs impliqués et leurs positions, 4) les implications pour les droits humains, 5) les perspectives d'évolution. Le résumé doit être suffisamment complet et nuancé pour qu'un lecteur comprenne pleinement le sujet sans lire l'article original.",
     "bluesky_post": "Texte accrocheur pour Bluesky (max 250 caractères, sans hashtags). Doit donner envie de lire l'article en posant une question percutante, en révélant un fait marquant, ou en soulignant l'urgence du sujet. Ne pas simplement résumer, mais interpeller le lecteur.",
     "main_points": [
         "Point principal 1",
@@ -168,7 +168,7 @@ PROMPT;
 
         return [
             'title' => $data['title'] ?? 'Sans titre',
-            'summary' => $data['summary'] ?? '',
+            'summary' => $this->formatSummaryAsHtml($data['summary'] ?? ''),
             'bluesky_post' => $data['bluesky_post'] ?? '',
             'main_points' => $mainPointsHtml,
             'main_points_raw' => $data['main_points'] ?? [],
@@ -256,6 +256,30 @@ PROMPT;
         }
 
         return $html;
+    }
+
+    /**
+     * Formater le résumé en HTML avec des paragraphes
+     */
+    private function formatSummaryAsHtml(string $summary): string {
+        if (empty($summary)) {
+            return '';
+        }
+
+        // Séparer par doubles retours à la ligne (paragraphes)
+        $paragraphs = preg_split('/\n\s*\n/', trim($summary));
+
+        $html = '';
+        foreach ($paragraphs as $paragraph) {
+            $paragraph = trim($paragraph);
+            if (!empty($paragraph)) {
+                // Convertir les retours simples en <br> et échapper le HTML
+                $content = nl2br(htmlspecialchars($paragraph));
+                $html .= '<p>' . $content . '</p>';
+            }
+        }
+
+        return $html ?: '<p>' . htmlspecialchars($summary) . '</p>';
     }
 
     /**
