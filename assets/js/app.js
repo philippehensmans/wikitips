@@ -121,7 +121,7 @@ class RichEditor {
         this.content = document.createElement('div');
         this.content.className = 'rich-editor-content';
         this.content.contentEditable = true;
-        this.content.innerHTML = this.textarea.value || '<p><br></p>';
+        this.content.innerHTML = this.convertToHtml(this.textarea.value) || '<p><br></p>';
 
         // Assembler
         this.wrapper.appendChild(this.toolbar);
@@ -206,8 +206,31 @@ class RichEditor {
     }
 
     setContent(html) {
-        this.content.innerHTML = html || '<p><br></p>';
+        this.content.innerHTML = this.convertToHtml(html) || '<p><br></p>';
         this.syncToTextarea();
+    }
+
+    /**
+     * Convertit le texte brut avec des retours à la ligne en HTML avec des paragraphes.
+     * Si le contenu contient déjà des balises HTML, le retourne tel quel.
+     */
+    convertToHtml(text) {
+        if (!text || !text.trim()) {
+            return '';
+        }
+
+        // Si le contenu contient déjà des balises HTML de bloc, le retourner tel quel
+        if (/<(p|br|div|ul|ol|li|table|h[1-6])[>\s/]/i.test(text)) {
+            return text;
+        }
+
+        // Convertir les retours à la ligne en paragraphes
+        const paragraphs = text.split(/\n\n+/); // Séparer par double retour à la ligne
+        return paragraphs.map(para => {
+            // Pour chaque paragraphe, convertir les retours simples en <br>
+            const content = para.trim().replace(/\n/g, '<br>');
+            return content ? '<p>' + content + '</p>' : '';
+        }).filter(p => p).join('');
     }
 }
 
