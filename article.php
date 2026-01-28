@@ -53,6 +53,9 @@ if (!empty($article['summary'])) {
 $whatsappText .= "🔗 " . $articleUrl;
 $whatsappUrl = 'https://wa.me/?text=' . rawurlencode($whatsappText);
 
+// URL Facebook
+$facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($articleUrl);
+
 ob_start();
 ?>
 
@@ -70,6 +73,7 @@ ob_start();
     <div class="article-actions">
         <a href="<?= url('edit.php?id=' . $article['id']) ?>">Modifier</a>
         <a href="<?= htmlspecialchars($whatsappUrl) ?>" class="btn-whatsapp" target="_blank" title="Partager sur WhatsApp">💬 WhatsApp</a>
+        <a href="<?= htmlspecialchars($facebookUrl) ?>" class="btn-facebook" target="_blank" title="Partager sur Facebook">📘 Facebook</a>
         <?php if ($blueskyConfigured): ?>
         <a href="<?= url('share-bluesky.php?id=' . $article['id']) ?>" class="btn-bluesky" title="Partager sur Bluesky">🦋 Bluesky</a>
         <?php endif; ?>

@@ -512,6 +512,24 @@ a:hover {
     color: white;
 }
 
+.btn-facebook {
+    background: #1877F2;
+    border-color: #166FE5;
+    color: white !important;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+.btn-facebook:hover {
+    background: #166FE5;
+    text-decoration: none;
+}
+
+.btn-facebook:visited {
+    color: white;
+}
+
 .btn-group {
     display: flex;
     gap: 10px;
