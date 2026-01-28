@@ -54,7 +54,12 @@ ob_start();
                 <li class="article-list-item">
                     <h3><a href="<?= url('article.php?slug=' . htmlspecialchars($article['slug'])) ?>"><?= htmlspecialchars($article['title']) ?></a></h3>
                     <?php if ($article['summary']): ?>
-                        <p class="summary"><?= htmlspecialchars(mb_substr(strip_tags($article['summary']), 0, 200)) ?>...</p>
+                        <?php
+                        $summaryClean = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $summaryDisplay = mb_substr($summaryClean, 0, 400);
+                        if (mb_strlen($summaryClean) > 400) $summaryDisplay .= '...';
+                        ?>
+                        <p class="summary"><?= htmlspecialchars($summaryDisplay) ?></p>
                     <?php endif; ?>
                     <div class="meta">
                         Publié le <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
