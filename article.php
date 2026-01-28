@@ -56,6 +56,18 @@ $whatsappUrl = 'https://wa.me/?text=' . rawurlencode($whatsappText);
 // URL Facebook
 $facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($articleUrl);
 
+// Message Facebook (sera copié dans le presse-papiers)
+$facebookText = "📰 " . $article['title'] . "\n\n";
+if (!empty($article['summary'])) {
+    $summaryCleanFb = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $summaryShortFb = mb_substr($summaryCleanFb, 0, 200);
+    if (mb_strlen($summaryCleanFb) > 200) {
+        $summaryShortFb .= '...';
+    }
+    $facebookText .= $summaryShortFb . "\n\n";
+}
+$facebookText .= "🔗 " . $articleUrl;
+
 ob_start();
 ?>
 
@@ -73,7 +85,7 @@ ob_start();
     <div class="article-actions">
         <a href="<?= url('edit.php?id=' . $article['id']) ?>">Modifier</a>
         <a href="<?= htmlspecialchars($whatsappUrl) ?>" class="btn-whatsapp" target="_blank" title="Partager sur WhatsApp">💬 WhatsApp</a>
-        <a href="<?= htmlspecialchars($facebookUrl) ?>" class="btn-facebook" target="_blank" title="Partager sur Facebook">📘 Facebook</a>
+        <a href="#" onclick="shareOnFacebook(); return false;" class="btn-facebook" title="Partager sur Facebook">📘 Facebook</a>
         <?php if ($blueskyConfigured): ?>
         <a href="<?= url('share-bluesky.php?id=' . $article['id']) ?>" class="btn-bluesky" title="Partager sur Bluesky">🦋 Bluesky</a>
         <?php endif; ?>
@@ -218,6 +230,30 @@ if ($reviewData): ?>
 <script>
 // Données pour la copie de la recension
 const reviewPlainText = <?= json_encode($reviewData ? ($reviewData['plain_text'] ?? '') : '') ?>;
+
+// Données pour le partage Facebook
+const facebookText = <?= json_encode($facebookText) ?>;
+const facebookUrl = <?= json_encode($facebookUrl) ?>;
+
+function shareOnFacebook() {
+    // Copier le texte dans le presse-papiers
+    navigator.clipboard.writeText(facebookText).then(() => {
+        // Ouvrir la fenêtre de partage Facebook
+        window.open(facebookUrl, '_blank', 'width=600,height=400');
+        // Afficher un message
+        alert('📋 Texte copié dans le presse-papiers !\n\nCollez-le (Ctrl+V) dans votre publication Facebook.');
+    }).catch(err => {
+        // Fallback pour les navigateurs sans clipboard API
+        const textarea = document.createElement('textarea');
+        textarea.value = facebookText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        window.open(facebookUrl, '_blank', 'width=600,height=400');
+        alert('📋 Texte copié dans le presse-papiers !\n\nCollez-le (Ctrl+V) dans votre publication Facebook.');
+    });
+}
 
 function copyReviewToClipboard() {
     navigator.clipboard.writeText(reviewPlainText).then(() => {
