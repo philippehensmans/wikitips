@@ -68,6 +68,21 @@ if (!empty($article['summary'])) {
 }
 $facebookText .= "🔗 " . $articleUrl;
 
+// URL LinkedIn
+$linkedinUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode($articleUrl);
+
+// Message LinkedIn (sera copié dans le presse-papiers)
+$linkedinText = "📰 " . $article['title'] . "\n\n";
+if (!empty($article['summary'])) {
+    $summaryCleanLi = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $summaryShortLi = mb_substr($summaryCleanLi, 0, 250);
+    if (mb_strlen($summaryCleanLi) > 250) {
+        $summaryShortLi .= '...';
+    }
+    $linkedinText .= $summaryShortLi . "\n\n";
+}
+$linkedinText .= "🔗 " . $articleUrl;
+
 ob_start();
 ?>
 
@@ -86,6 +101,7 @@ ob_start();
         <a href="<?= url('edit.php?id=' . $article['id']) ?>">Modifier</a>
         <a href="<?= htmlspecialchars($whatsappUrl) ?>" class="btn-whatsapp" target="_blank" title="Partager sur WhatsApp">💬 WhatsApp</a>
         <a href="#" onclick="shareOnFacebook(); return false;" class="btn-facebook" title="Partager sur Facebook">📘 Facebook</a>
+        <a href="#" onclick="shareOnLinkedin(); return false;" class="btn-linkedin" title="Partager sur LinkedIn">💼 LinkedIn</a>
         <?php if ($blueskyConfigured): ?>
         <a href="<?= url('share-bluesky.php?id=' . $article['id']) ?>" class="btn-bluesky" title="Partager sur Bluesky">🦋 Bluesky</a>
         <?php endif; ?>
@@ -235,6 +251,10 @@ const reviewPlainText = <?= json_encode($reviewData ? ($reviewData['plain_text']
 const facebookText = <?= json_encode($facebookText) ?>;
 const facebookUrl = <?= json_encode($facebookUrl) ?>;
 
+// Données pour le partage LinkedIn
+const linkedinText = <?= json_encode($linkedinText) ?>;
+const linkedinUrl = <?= json_encode($linkedinUrl) ?>;
+
 function shareOnFacebook() {
     // Copier le texte dans le presse-papiers
     navigator.clipboard.writeText(facebookText).then(() => {
@@ -252,6 +272,26 @@ function shareOnFacebook() {
         document.body.removeChild(textarea);
         window.open(facebookUrl, '_blank', 'width=600,height=400');
         alert('📋 Texte copié dans le presse-papiers !\n\nCollez-le (Ctrl+V) dans votre publication Facebook.');
+    });
+}
+
+function shareOnLinkedin() {
+    // Copier le texte dans le presse-papiers
+    navigator.clipboard.writeText(linkedinText).then(() => {
+        // Ouvrir la fenêtre de partage LinkedIn
+        window.open(linkedinUrl, '_blank', 'width=600,height=500');
+        // Afficher un message
+        alert('📋 Texte copié dans le presse-papiers !\n\nCollez-le (Ctrl+V) dans votre publication LinkedIn.');
+    }).catch(err => {
+        // Fallback pour les navigateurs sans clipboard API
+        const textarea = document.createElement('textarea');
+        textarea.value = linkedinText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        window.open(linkedinUrl, '_blank', 'width=600,height=500');
+        alert('📋 Texte copié dans le presse-papiers !\n\nCollez-le (Ctrl+V) dans votre publication LinkedIn.');
     });
 }
 
