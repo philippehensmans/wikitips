@@ -37,17 +37,25 @@
                     <div class="subtitle"><?= SITE_DESCRIPTION ?></div>
                 </div>
             </a>
-            <div style="display: flex; align-items: center; gap: 15px;">
+
+            <!-- Bouton menu hamburger pour mobile -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu" aria-expanded="false">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <div class="wiki-header-right" id="headerRight">
                 <form class="wiki-search" action="<?= url('search.php') ?>" method="get">
                     <input type="text" name="q" placeholder="Rechercher..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
                     <button type="submit">Rechercher</button>
                 </form>
                 <div class="user-menu">
                     <?php if ($isLoggedIn): ?>
-                        <a href="<?= url('profile.php') ?>" style="font-size: 12px; color: #666;"><?= htmlspecialchars($currentUser['username']) ?></a>
-                        <a href="<?= url('logout.php') ?>" style="font-size: 12px;">Déconnexion</a>
+                        <a href="<?= url('profile.php') ?>"><?= htmlspecialchars($currentUser['username']) ?></a>
+                        <a href="<?= url('logout.php') ?>">Déconnexion</a>
                     <?php else: ?>
-                        <a href="<?= url('login.php') ?>" style="font-size: 12px;">Connexion</a>
+                        <a href="<?= url('login.php') ?>">Connexion</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -65,7 +73,9 @@
     </nav>
 
     <div class="wiki-container">
-        <aside class="wiki-sidebar">
+        <!-- Overlay pour fermer le menu mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <aside class="wiki-sidebar" id="wikSidebar">
             <div class="sidebar-section">
                 <h3>Navigation</h3>
                 <ul>

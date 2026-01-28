@@ -635,36 +635,436 @@ a:hover {
     color: var(--wiki-text-light);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .wiki-container {
-        flex-direction: column;
-    }
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
 
-    .wiki-sidebar {
-        width: 100%;
-        min-height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--wiki-border);
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.hamburger-line {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: var(--wiki-text);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-menu-toggle.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-toggle.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Header Right Section */
+.wiki-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.user-menu a {
+    color: var(--wiki-text-light);
+    white-space: nowrap;
+}
+
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* ==========================================
+   TABLET BREAKPOINT (1024px)
+   ========================================== */
+@media (max-width: 1024px) {
+    :root {
+        --sidebar-width: 180px;
     }
 
     .wiki-content {
-        max-width: 100%;
+        padding: 20px;
     }
 
+    .wiki-search input {
+        width: 200px;
+    }
+
+    .infobox {
+        width: 240px;
+    }
+}
+
+/* ==========================================
+   SMALL TABLET / LARGE MOBILE (768px)
+   ========================================== */
+@media (max-width: 768px) {
+    /* Show mobile menu toggle */
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
+    /* Header adjustments */
+    .wiki-header {
+        padding: 10px 15px;
+    }
+
+    .wiki-header-inner {
+        position: relative;
+    }
+
+    .wiki-logo h1 {
+        font-size: 1.2em;
+    }
+
+    .wiki-logo .subtitle {
+        font-size: 0.65em;
+    }
+
+    /* Header right - hidden by default on mobile */
+    .wiki-header-right {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: -15px;
+        right: -15px;
+        background: var(--wiki-bg-light);
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+        border-bottom: 1px solid var(--wiki-border);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+    }
+
+    .wiki-header-right.active {
+        display: flex;
+    }
+
+    .wiki-search {
+        width: 100%;
+    }
+
+    .wiki-search input {
+        width: 100%;
+        flex: 1;
+    }
+
+    .user-menu {
+        width: 100%;
+        justify-content: center;
+        padding-top: 10px;
+        border-top: 1px solid var(--wiki-border);
+    }
+
+    /* Navigation */
+    .wiki-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 8px 15px;
+        gap: 10px 20px;
+    }
+
+    /* Container */
+    .wiki-container {
+        flex-direction: column;
+        position: relative;
+    }
+
+    /* Sidebar - transforms to slide-out menu on mobile */
+    .wiki-sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        min-height: 100vh;
+        border-right: 1px solid var(--wiki-border);
+        border-bottom: none;
+        z-index: 999;
+        overflow-y: auto;
+        transition: left 0.3s ease;
+        padding-top: 60px;
+    }
+
+    .wiki-sidebar.active {
+        left: 0;
+    }
+
+    /* Content */
+    .wiki-content {
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    /* Infobox */
     .infobox {
         float: none;
         width: 100%;
         margin: 15px 0;
     }
 
-    .wiki-header-inner {
+    /* Article */
+    .article-header h1 {
+        font-size: 1.5em;
+    }
+
+    .article-actions {
+        float: none;
+        margin-bottom: 10px;
+    }
+
+    /* Review */
+    .review-header {
         flex-direction: column;
         gap: 10px;
     }
 
-    .wiki-search input {
+    .review-meta {
+        align-items: flex-start;
+    }
+
+    /* AI Section */
+    .ai-section {
+        padding: 15px;
+        margin: 20px 0;
+    }
+
+    /* Form groups */
+    .btn-group {
+        flex-wrap: wrap;
+    }
+
+    /* Editor toolbar */
+    .rich-editor-toolbar {
+        justify-content: center;
+    }
+}
+
+/* ==========================================
+   MOBILE BREAKPOINT (480px)
+   ========================================== */
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+    }
+
+    .wiki-header {
+        padding: 8px 10px;
+    }
+
+    .wiki-logo h1 {
+        font-size: 1em;
+    }
+
+    .wiki-logo .subtitle {
+        display: none;
+    }
+
+    .wiki-nav {
+        font-size: 12px;
+        gap: 8px 15px;
+    }
+
+    .wiki-content {
+        padding: 10px;
+    }
+
+    .article-header h1 {
+        font-size: 1.3em;
+    }
+
+    .article-section h2 {
+        font-size: 1.2em;
+    }
+
+    .article-section h3 {
+        font-size: 1.1em;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn-group .btn {
         width: 100%;
+        text-align: center;
+    }
+
+    /* Article list */
+    .article-list-item {
+        padding: 12px 10px;
+    }
+
+    .article-list-item h3 {
+        font-size: 1em;
+    }
+
+    /* Editor */
+    .editor-container {
+        padding: 10px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="url"],
+    .form-group textarea,
+    .form-group select {
+        font-size: 16px; /* Prevent iOS zoom on focus */
+    }
+
+    /* Categories */
+    .category-tag {
+        font-size: 11px;
+        padding: 2px 6px;
+    }
+
+    /* AI Section */
+    .ai-section h2 {
+        font-size: 1.1em;
+    }
+
+    .btn-ai {
+        width: 100%;
+        padding: 10px 20px;
+    }
+
+    /* Human Rights Box */
+    .human-rights-box {
+        padding: 10px;
+    }
+
+    /* Source box */
+    .source-box {
+        font-size: 11px;
+    }
+
+    /* Footer */
+    .wiki-footer {
+        padding: 15px 10px;
+    }
+}
+
+/* ==========================================
+   SMALL MOBILE BREAKPOINT (360px)
+   ========================================== */
+@media (max-width: 360px) {
+    .wiki-logo h1 {
+        font-size: 0.9em;
+    }
+
+    .wiki-nav {
+        font-size: 11px;
+        gap: 5px 10px;
+    }
+
+    .wiki-nav a {
+        padding: 2px 0;
+    }
+
+    .article-header h1 {
+        font-size: 1.15em;
+    }
+
+    .infobox-label {
+        width: 70px;
+        font-size: 12px;
+    }
+
+    .infobox-value {
+        font-size: 12px;
+    }
+}
+
+/* ==========================================
+   LANDSCAPE MOBILE ORIENTATION
+   ========================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+    .wiki-sidebar {
+        width: 250px;
+        padding-top: 50px;
+    }
+
+    .wiki-header-right {
+        top: 100%;
+    }
+}
+
+/* ==========================================
+   TOUCH DEVICE IMPROVEMENTS
+   ========================================== */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    .sidebar-section li {
+        margin: 8px 0;
+    }
+
+    .sidebar-section a {
+        display: block;
+        padding: 5px 0;
+    }
+
+    .wiki-nav a {
+        padding: 5px 0;
+    }
+
+    .btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Remove hover effects that don't work well on touch */
+    .article-list-item:hover {
+        background: transparent;
+    }
+
+    .article-list-item:active {
+        background: var(--wiki-bg-light);
     }
 }
 

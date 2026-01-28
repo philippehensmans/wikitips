@@ -19,7 +19,105 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.height = (this.scrollHeight) + 'px';
         });
     });
+
+    // Mobile menu functionality
+    initMobileMenu();
 });
+
+/**
+ * Initialise le menu mobile
+ */
+function initMobileMenu() {
+    const menuToggle = document.getElementById('mobileMenuToggle');
+    const headerRight = document.getElementById('headerRight');
+    const sidebar = document.getElementById('wikSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (!menuToggle) return;
+
+    // Toggle du menu header
+    menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isActive = this.classList.toggle('active');
+
+        // Toggle header menu
+        if (headerRight) {
+            headerRight.classList.toggle('active');
+        }
+
+        // Toggle sidebar
+        if (sidebar) {
+            sidebar.classList.toggle('active');
+        }
+
+        // Toggle overlay
+        if (overlay) {
+            overlay.classList.toggle('active');
+        }
+
+        // Update aria-expanded
+        this.setAttribute('aria-expanded', isActive);
+
+        // Prevent body scroll when menu is open
+        document.body.style.overflow = isActive ? 'hidden' : '';
+    });
+
+    // Close menu when clicking on overlay
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            closeMobileMenu();
+        });
+    }
+
+    // Close menu when clicking on a sidebar link
+    if (sidebar) {
+        sidebar.querySelectorAll('a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                closeMobileMenu();
+            });
+        });
+    }
+
+    // Close menu on window resize (when switching to desktop)
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeMobileMenu();
+        }
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeMobileMenu();
+        }
+    });
+}
+
+/**
+ * Ferme le menu mobile
+ */
+function closeMobileMenu() {
+    const menuToggle = document.getElementById('mobileMenuToggle');
+    const headerRight = document.getElementById('headerRight');
+    const sidebar = document.getElementById('wikSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (menuToggle) {
+        menuToggle.classList.remove('active');
+        menuToggle.setAttribute('aria-expanded', 'false');
+    }
+    if (headerRight) {
+        headerRight.classList.remove('active');
+    }
+    if (sidebar) {
+        sidebar.classList.remove('active');
+    }
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+
+    document.body.style.overflow = '';
+}
 
 /**
  * Fonction utilitaire pour les appels API
