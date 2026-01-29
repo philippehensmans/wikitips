@@ -749,6 +749,38 @@ a:hover {
 }
 
 /* ==========================================
+   DESKTOP RESET (above 768px)
+   Ensures proper display when resizing from mobile to desktop
+   ========================================== */
+@media (min-width: 769px) {
+    .wiki-header-right {
+        display: flex !important;
+        position: static !important;
+        background: transparent !important;
+        flex-direction: row !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .wiki-sidebar {
+        position: static !important;
+        left: auto !important;
+        width: var(--sidebar-width) !important;
+        height: auto !important;
+        min-height: auto !important;
+    }
+
+    .sidebar-overlay {
+        display: none !important;
+    }
+
+    .mobile-menu-toggle {
+        display: none !important;
+    }
+}
+
+/* ==========================================
    TABLET BREAKPOINT (1024px)
    ========================================== */
 @media (max-width: 1024px) {
