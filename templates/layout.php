@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? SITE_NAME) ?></title>
+
+    <!-- Open Graph / LinkedIn / Facebook -->
+    <meta property="og:type" content="<?= $ogType ?? 'website' ?>">
+    <meta property="og:site_name" content="<?= SITE_NAME ?>">
+    <meta property="og:title" content="<?= htmlspecialchars($ogTitle ?? $pageTitle ?? SITE_NAME) ?>">
+    <?php if (!empty($ogDescription)): ?>
+    <meta property="og:description" content="<?= htmlspecialchars($ogDescription) ?>">
+    <?php endif; ?>
+    <?php if (!empty($ogUrl)): ?>
+    <meta property="og:url" content="<?= htmlspecialchars($ogUrl) ?>">
+    <?php endif; ?>
+    <?php if (!empty($ogImage)): ?>
+    <meta property="og:image" content="<?= htmlspecialchars($ogImage) ?>">
+    <?php endif; ?>
+
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= time() ?>">
     <link rel="icon" href="<?= url('assets/images/favicon.ico') ?>" type="image/x-icon">
     <!-- Matomo -->
