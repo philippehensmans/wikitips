@@ -118,11 +118,17 @@ a:hover {
 
 /* Navigation */
 .wiki-nav {
-    display: flex;
-    gap: 20px;
-    padding: 8px 20px;
     background: var(--wiki-bg-light);
     border-bottom: 1px solid var(--wiki-border);
+    padding: 0 20px;
+}
+
+.wiki-nav-inner {
+    display: flex;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 8px 0;
     font-size: 13px;
 }
 
@@ -865,9 +871,13 @@ a:hover {
 
     /* Navigation */
     .wiki-nav {
+        padding: 0 15px;
+    }
+
+    .wiki-nav-inner {
         flex-wrap: wrap;
         justify-content: center;
-        padding: 8px 15px;
+        padding: 8px 0;
         gap: 10px 20px;
     }
 
@@ -967,7 +977,7 @@ a:hover {
         display: none;
     }
 
-    .wiki-nav {
+    .wiki-nav-inner {
         font-size: 12px;
         gap: 8px 15px;
     }
@@ -1064,12 +1074,12 @@ a:hover {
         font-size: 0.9em;
     }
 
-    .wiki-nav {
+    .wiki-nav-inner {
         font-size: 11px;
         gap: 5px 10px;
     }
 
-    .wiki-nav a {
+    .wiki-nav-inner a {
         padding: 2px 0;
     }
 
@@ -1115,7 +1125,7 @@ a:hover {
         padding: 5px 0;
     }
 
-    .wiki-nav a {
+    .wiki-nav-inner a {
         padding: 5px 0;
     }
 

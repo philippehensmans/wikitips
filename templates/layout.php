@@ -63,13 +63,15 @@
     </header>
 
     <nav class="wiki-nav">
-        <a href="<?= url() ?>">Accueil</a>
-        <a href="<?= url('articles.php') ?>">Articles</a>
-        <a href="<?= url('categories.php') ?>">Catégories</a>
-        <?php if ($isLoggedIn): ?>
-            <a href="<?= url('new.php') ?>">Nouvel article</a>
-            <a href="<?= url('import.php') ?>">Importer</a>
-        <?php endif; ?>
+        <div class="wiki-nav-inner">
+            <a href="<?= url() ?>">Accueil</a>
+            <a href="<?= url('articles.php') ?>">Articles</a>
+            <a href="<?= url('categories.php') ?>">Catégories</a>
+            <?php if ($isLoggedIn): ?>
+                <a href="<?= url('new.php') ?>">Nouvel article</a>
+                <a href="<?= url('import.php') ?>">Importer</a>
+            <?php endif; ?>
+        </div>
     </nav>
 
     <div class="wiki-container">
