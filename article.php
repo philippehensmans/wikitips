@@ -68,11 +68,7 @@ $facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($a
 $facebookText = "📰 " . $article['title'] . "\n\n";
 if (!empty($article['summary'])) {
     $summaryCleanFb = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $summaryShortFb = mb_substr($summaryCleanFb, 0, 200);
-    if (mb_strlen($summaryCleanFb) > 200) {
-        $summaryShortFb .= '...';
-    }
-    $facebookText .= $summaryShortFb . "\n\n";
+    $facebookText .= $summaryCleanFb . "\n\n";
 }
 $facebookText .= "🔗 " . $articleUrl;
 
