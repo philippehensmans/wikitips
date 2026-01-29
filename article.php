@@ -45,7 +45,6 @@ $ogType = 'article';
 $ogUrl = $articleUrl;
 if (!empty($article['summary'])) {
     $ogDescription = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $ogDescription = mb_substr($ogDescription, 0, 300);
 }
 
 // Message WhatsApp
