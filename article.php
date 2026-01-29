@@ -83,11 +83,7 @@ $linkedinUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlen
 $linkedinText = "📰 " . $article['title'] . "\n\n";
 if (!empty($article['summary'])) {
     $summaryCleanLi = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $summaryShortLi = mb_substr($summaryCleanLi, 0, 250);
-    if (mb_strlen($summaryCleanLi) > 250) {
-        $summaryShortLi .= '...';
-    }
-    $linkedinText .= $summaryShortLi . "\n\n";
+    $linkedinText .= $summaryCleanLi . "\n\n";
 }
 $linkedinText .= "🔗 " . $articleUrl;
 
