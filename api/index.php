@@ -1,6 +1,6 @@
 <?php
 /**
- * API REST pour WikiTips
+ * API REST pour News
  * Gestion des articles et analyse via Claude
  */
 

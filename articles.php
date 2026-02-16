@@ -1,6 +1,6 @@
 <?php
 /**
- * WikiTips - Liste des articles
+ * News - Liste des articles
  */
 require_once __DIR__ . '/config.php';
 

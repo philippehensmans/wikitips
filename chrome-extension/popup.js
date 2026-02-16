@@ -1,5 +1,5 @@
 /**
- * WikiTips Chrome Extension - Popup Script
+ * News Chrome Extension - Popup Script
  */
 
 document.addEventListener('DOMContentLoaded', async function() {

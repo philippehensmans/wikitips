@@ -1,5 +1,5 @@
 /**
- * WikiTips Chrome Extension - Content Script
+ * News Chrome Extension - Content Script
  * Ce script s'exécute sur chaque page pour permettre la capture de texte
  */
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * WikiTips - Importer et analyser du contenu
+ * News - Importer et analyser du contenu
  */
 require_once __DIR__ . '/config.php';
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * WikiTips - Partage sur Bluesky
+ * News - Partage sur Bluesky
  */
 require_once __DIR__ . '/config.php';
 

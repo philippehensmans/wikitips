@@ -1,6 +1,6 @@
 <?php
 /**
- * WikiTips - Gestion des utilisateurs (Admin)
+ * News - Gestion des utilisateurs (Admin)
  */
 require_once __DIR__ . '/config.php';
 

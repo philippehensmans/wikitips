@@ -1,19 +1,19 @@
 /**
- * WikiTips Chrome Extension - Background Service Worker
+ * News Chrome Extension - Background Service Worker
  */
 
 // Créer le menu contextuel au démarrage
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
-        id: 'wikitips-analyze',
-        title: 'Analyser avec WikiTips',
+        id: 'news-analyze',
+        title: 'Analyser avec News',
         contexts: ['selection']
     });
 });
 
 // Gérer les clics sur le menu contextuel
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-    if (info.menuItemId === 'wikitips-analyze') {
+    if (info.menuItemId === 'news-analyze') {
         const selectedText = info.selectionText;
         const sourceUrl = tab.url;
 
@@ -52,7 +52,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 chrome.notifications.create({
                     type: 'basic',
                     iconUrl: 'icons/icon48.png',
-                    title: 'WikiTips - Erreur',
+                    title: 'News - Erreur',
                     message: data.message || 'Erreur lors de l\'analyse'
                 });
             }
@@ -60,7 +60,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             chrome.notifications.create({
                 type: 'basic',
                 iconUrl: 'icons/icon48.png',
-                title: 'WikiTips - Erreur',
+                title: 'News - Erreur',
                 message: 'Erreur de connexion au serveur'
             });
         }

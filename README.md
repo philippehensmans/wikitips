@@ -1,4 +1,4 @@
-# WikiTips - Veille Droits Humains
+# News - Veille Droits Humains
 
 Application PHP de publication rapide d'informations avec analyse automatique sous l'angle des droits humains grâce à Claude AI.
 
@@ -34,7 +34,7 @@ Application PHP de publication rapide d'informations avec analyse automatique so
 1. Clonez le repository :
 ```bash
 git clone <repository-url>
-cd wikitips
+cd news
 ```
 
 2. Configurez votre clé API Claude :
@@ -61,7 +61,7 @@ php -S localhost:8080
 ### Structure des fichiers
 
 ```
-wikitips/
+news/
 ├── api/                    # API REST
 │   └── index.php
 ├── assets/
@@ -104,7 +104,7 @@ wikitips/
 ### Configuration
 
 1. Cliquez sur l'icône de l'extension
-2. Entrez l'URL de votre serveur WikiTips (ex: `http://localhost:8080`)
+2. Entrez l'URL de votre serveur News (ex: `http://localhost:8080`)
 3. Entrez votre clé API secrète (définie dans `config.php`)
 
 ### Utilisation
@@ -117,7 +117,7 @@ wikitips/
 
 **Méthode 2 : Menu contextuel**
 1. Sélectionnez du texte sur une page web
-2. Clic droit → "Analyser avec WikiTips"
+2. Clic droit → "Analyser avec News"
 
 ## API REST
 
