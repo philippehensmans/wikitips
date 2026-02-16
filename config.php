@@ -93,6 +93,11 @@ function url(string $path = ''): string {
     return BASE_PATH . '/' . $path;
 }
 
+// Démarrer la session tôt pour éviter "headers already sent"
+if (session_status() === PHP_SESSION_NONE && php_sapi_name() !== 'cli') {
+    session_start();
+}
+
 // Fuseau horaire
 date_default_timezone_set('Europe/Brussels');
 
