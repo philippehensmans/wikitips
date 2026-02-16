@@ -1,2 +1,10 @@
-# WikiTips - Configuration minimale
+# News - Configuration Apache
 AddDefaultCharset UTF-8
+
+# Redirection de l'ancien chemin /wikitips/ vers /news/
+# Ces règles permettent de conserver les anciens liens fonctionnels
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/wikitips(/.*)?$ [NC]
+    RewriteRule ^(.*)$ /news%1 [R=301,L]
+</IfModule>

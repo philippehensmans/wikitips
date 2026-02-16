@@ -21,5 +21,5 @@ define('API_SECRET_KEY', 'votre-cle-secrete-aleatoire');
 define('SITE_URL', 'https://votre-domaine.com');
 
 // Nom et description du site (optionnel)
-// define('SITE_NAME', 'WikiTips - Mon Site');
+// define('SITE_NAME', 'News - Mon Site');
 // define('SITE_DESCRIPTION', 'Ma description personnalisée');

@@ -1,4 +1,4 @@
-# WikiTips - Manuel d'utilisation
+# News - Manuel d'utilisation
 
 ## Table des matières
 
@@ -29,7 +29,7 @@
 
 ## Introduction
 
-**WikiTips** est une application web PHP permettant de collecter, publier et analyser rapidement des informations provenant du web. Elle intègre l'intelligence artificielle Claude d'Anthropic pour fournir une analyse automatique du contenu sous l'angle des droits humains.
+**News** est une application web PHP permettant de collecter, publier et analyser rapidement des informations provenant du web. Elle intègre l'intelligence artificielle Claude d'Anthropic pour fournir une analyse automatique du contenu sous l'angle des droits humains.
 
 ### Objectifs
 
@@ -79,7 +79,7 @@
 |----------------|-------------|
 | Capture de page | Extraction du titre et contenu |
 | Menu contextuel | Clic droit pour analyser |
-| Envoi direct | Transfert vers WikiTips en un clic |
+| Envoi direct | Transfert vers News en un clic |
 
 ### Partage social
 
@@ -109,7 +109,7 @@
 ### Structure des fichiers
 
 ```
-wikitips/
+news/
 │
 ├── config.php                 # Configuration principale
 ├── config.local.php           # Configuration locale (à créer)
@@ -155,7 +155,7 @@ wikitips/
 │       └── favicon.ico        # Icône du site
 │
 ├── data/
-│   ├── wikitips.db            # Base de données SQLite (auto-créée)
+│   ├── news.db            # Base de données SQLite (auto-créée)
 │   └── .htaccess              # Protection du dossier
 │
 └── chrome-extension/
@@ -244,17 +244,17 @@ wikitips/
 
 ```bash
 # Cloner le dépôt ou télécharger l'archive
-git clone <url-du-depot> wikitips
+git clone <url-du-depot> news
 
 # Ou extraire l'archive
-unzip wikitips.zip -d /var/www/html/
+unzip news.zip -d /var/www/html/
 ```
 
 #### Étape 2 : Configurer les permissions
 
 ```bash
 # Le dossier doit être accessible en écriture pour SQLite
-cd /var/www/html/wikitips
+cd /var/www/html/news
 chmod 755 .
 chmod 755 data/  # Créer le dossier si nécessaire
 ```
@@ -266,7 +266,7 @@ Créez le fichier `config.local.php` à la racine :
 ```php
 <?php
 /**
- * Configuration locale WikiTips
+ * Configuration locale News
  * Ce fichier n'est pas versionné (ajoutez-le à .gitignore)
  */
 
@@ -280,12 +280,12 @@ define('API_SECRET_KEY', 'votre-cle-secrete-aleatoire-32-caracteres');
 
 // Chemin de base (si installé dans un sous-répertoire)
 // Décommentez et ajustez si nécessaire
-// define('BASE_PATH', '/wikitips');
+// define('BASE_PATH', '/news');
 ```
 
 #### Étape 4 : Vérifier l'installation
 
-1. Accédez à `https://votresite.com/wikitips/`
+1. Accédez à `https://votresite.com/news/`
 2. La base de données est créée automatiquement
 3. Connectez-vous avec `admin` / `admin123`
 4. **Changez immédiatement le mot de passe admin**
@@ -298,7 +298,7 @@ define('API_SECRET_KEY', 'votre-cle-secrete-aleatoire-32-caracteres');
 
 ```javascript
 // Ligne ~1-5 : Configurez l'URL de votre installation
-const WIKITIPS_URL = 'https://votresite.com/wikitips';
+const NEWS_URL = 'https://votresite.com/news';
 
 // Ligne ~10 : Même clé que dans config.local.php
 const API_KEY = 'votre-cle-secrete-aleatoire-32-caracteres';
@@ -310,12 +310,12 @@ const API_KEY = 'votre-cle-secrete-aleatoire-32-caracteres';
 2. Activez le **Mode développeur** (interrupteur en haut à droite)
 3. Cliquez sur **Charger l'extension non empaquetée**
 4. Sélectionnez le dossier `chrome-extension/`
-5. L'icône WikiTips apparaît dans la barre d'outils
+5. L'icône News apparaît dans la barre d'outils
 
 #### Étape 3 : Épingler l'extension (optionnel)
 
 1. Cliquez sur l'icône puzzle (extensions) dans Chrome
-2. Cliquez sur l'épingle à côté de WikiTips
+2. Cliquez sur l'épingle à côté de News
 
 ---
 
@@ -328,7 +328,7 @@ Ce fichier contient les paramètres par défaut. **Ne le modifiez pas directemen
 ```php
 <?php
 // Paramètres par défaut
-define('DB_PATH', __DIR__ . '/data/wikitips.db');
+define('DB_PATH', __DIR__ . '/data/news.db');
 define('CLAUDE_API_KEY', '');  // À définir dans config.local.php
 define('CLAUDE_MODEL', 'claude-sonnet-4-20250514');
 define('API_SECRET_KEY', '');  // À définir dans config.local.php
@@ -347,7 +347,7 @@ Ce fichier contient vos paramètres spécifiques :
 |-----------|-------------|---------|
 | `CLAUDE_API_KEY` | Clé API Anthropic | `sk-ant-api03-xxx` |
 | `API_SECRET_KEY` | Clé secrète API REST | `ma-cle-secrete-123` |
-| `BASE_PATH` | Chemin si sous-répertoire | `/wikitips` |
+| `BASE_PATH` | Chemin si sous-répertoire | `/news` |
 | `DB_PATH` | Chemin base de données | `/var/data/wiki.db` |
 
 ### Obtenir une clé API Anthropic
@@ -430,16 +430,16 @@ La suppression se fait directement en base de données (fonctionnalité admin à
 **Méthode 1 : Via le popup**
 
 1. Naviguez vers la page à capturer
-2. Cliquez sur l'icône WikiTips
+2. Cliquez sur l'icône News
 3. Vérifiez le titre et l'URL affichés
-4. Cliquez sur **Envoyer vers WikiTips**
-5. WikiTips s'ouvre avec le formulaire pré-rempli
+4. Cliquez sur **Envoyer vers News**
+5. News s'ouvre avec le formulaire pré-rempli
 
 **Méthode 2 : Via le menu contextuel**
 
 1. Faites un clic droit n'importe où sur la page
-2. Sélectionnez **Analyser avec WikiTips**
-3. WikiTips s'ouvre automatiquement
+2. Sélectionnez **Analyser avec News**
+3. News s'ouvre automatiquement
 
 #### Résolution des problèmes de l'extension
 
@@ -447,7 +447,7 @@ La suppression se fait directement en base de données (fonctionnalité admin à
 |----------|----------|
 | Icône grisée | Rechargez l'extension dans `chrome://extensions/` |
 | "Clé API invalide" | Vérifiez que `API_KEY` est identique dans popup.js et config.local.php |
-| Erreur de connexion | Vérifiez l'URL dans `WIKITIPS_URL` |
+| Erreur de connexion | Vérifiez l'URL dans `NEWS_URL` |
 | Contenu non capturé | Certains sites bloquent les scripts, copiez manuellement |
 
 ### Analyse IA
@@ -514,7 +514,7 @@ Une interface dédiée permet aux administrateurs de gérer les utilisateurs :
 
 ## Intégration Bluesky
 
-WikiTips permet de partager automatiquement vos articles sur Bluesky, le réseau social décentralisé basé sur le protocole AT.
+News permet de partager automatiquement vos articles sur Bluesky, le réseau social décentralisé basé sur le protocole AT.
 
 ### Configuration Bluesky
 
@@ -526,10 +526,10 @@ Pour des raisons de sécurité, Bluesky utilise des "App Passwords" plutôt que 
 2. Allez dans **Settings** (Paramètres)
 3. Cliquez sur **App Passwords**
 4. Cliquez sur **Add App Password**
-5. Donnez un nom (ex: "WikiTips")
+5. Donnez un nom (ex: "News")
 6. Copiez le mot de passe généré (il ne sera plus affiché)
 
-#### Étape 2 : Configurer WikiTips
+#### Étape 2 : Configurer News
 
 Ajoutez dans votre fichier `config.local.php` :
 
@@ -573,7 +573,7 @@ Le post généré automatiquement comprend :
 
 Résumé de l'article (jusqu'à 200 caractères)...
 
-#DroitsHumains #WikiTips
+#DroitsHumains #News
 ```
 
 Plus une **carte de lien** avec :
@@ -609,7 +609,7 @@ define('BLUESKY_AUTO_SHARE', true);
 |--------|--------|
 | Longueur du texte | 300 caractères maximum |
 | Images | Non supportées (carte de lien uniquement) |
-| Fréquence | Pas de limite côté WikiTips |
+| Fréquence | Pas de limite côté News |
 
 ### Résolution des problèmes Bluesky
 
@@ -775,7 +775,7 @@ GET /api/?action=categories
 | Fichier | Action |
 |---------|--------|
 | `config.local.php` | Bloquer l'accès HTTP |
-| `data/wikitips.db` | Bloquer l'accès HTTP |
+| `data/news.db` | Bloquer l'accès HTTP |
 | `.git/` | Bloquer l'accès HTTP |
 
 ---
@@ -897,7 +897,7 @@ Pour signaler un bug ou demander de l'aide :
 
 ## Licence
 
-WikiTips est distribué sous licence MIT.
+News est distribué sous licence MIT.
 
 ---
 

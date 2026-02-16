@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "WikiTips - Capture & Analyse",
+    "name": "News - Capture & Analyse",
     "version": "1.0.0",
     "description": "Capturez du contenu web et analysez-le sous l'angle des droits humains",
     "permissions": [

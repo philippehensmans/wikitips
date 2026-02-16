@@ -1,6 +1,6 @@
 <?php
 /**
- * WikiTips - Configuration
+ * News - Configuration
  * Application de publication d'articles avec analyse des droits humains
  */
 
@@ -16,7 +16,7 @@ if (!defined('DEBUG_MODE')) {
 
 // Configuration de la base de données SQLite
 if (!defined('DB_PATH')) {
-    define('DB_PATH', __DIR__ . '/data/wikitips.db');
+    define('DB_PATH', __DIR__ . '/data/news.db');
 }
 
 // Configuration de l'API Claude
@@ -32,7 +32,7 @@ if (!defined('CLAUDE_MODEL')) {
 
 // Configuration du site
 if (!defined('SITE_NAME')) {
-    define('SITE_NAME', 'WikiTips - Droits Humains');
+    define('SITE_NAME', 'News - Droits Humains');
 }
 if (!defined('SITE_DESCRIPTION')) {
     define('SITE_DESCRIPTION', 'Veille et analyse sous l\'angle des droits humains');
@@ -58,8 +58,25 @@ if (!defined('BLUESKY_AUTO_SHARE')) {
     define('BLUESKY_AUTO_SHARE', false); // Partage automatique à la création d'article
 }
 
+// Ancien chemin de base (pour redirection automatique)
+// Si l'application était précédemment accessible sous /wikitips/,
+// les requêtes seront redirigées vers /news/
+if (!defined('OLD_BASE_PATH')) {
+    define('OLD_BASE_PATH', '/wikitips');
+}
+
+// Redirection automatique de l'ancien chemin vers le nouveau
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+if (defined('OLD_BASE_PATH') && OLD_BASE_PATH !== '' && preg_match('#^' . preg_quote(OLD_BASE_PATH, '#') . '(/.*)?$#i', $requestUri, $matches)) {
+    $newBasePath = defined('BASE_PATH') ? BASE_PATH : '/news';
+    $newPath = $newBasePath . ($matches[1] ?? '/');
+    header('HTTP/1.1 301 Moved Permanently');
+    header('Location: ' . $newPath);
+    exit;
+}
+
 // Chemin de base (auto-détecté ou défini manuellement)
-// Ex: si installé dans /wikitips/, définir BASE_PATH = '/wikitips'
+// Ex: si installé dans /news/, définir BASE_PATH = '/news'
 if (!defined('BASE_PATH')) {
     // Auto-détection du chemin de base
     $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';

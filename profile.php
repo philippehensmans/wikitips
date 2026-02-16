@@ -1,6 +1,6 @@
 <?php
 /**
- * WikiTips - Profil utilisateur
+ * News - Profil utilisateur
  */
 require_once __DIR__ . '/config.php';
 

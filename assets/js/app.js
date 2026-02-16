@@ -1,5 +1,5 @@
 /**
- * WikiTips - JavaScript principal
+ * News - JavaScript principal
  */
 
 document.addEventListener('DOMContentLoaded', function() {
