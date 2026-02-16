@@ -1,18 +1,2 @@
 # News - Configuration Apache
 AddDefaultCharset UTF-8
-
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-    # Redirection de l'ancien chemin /wikitips/ vers /news/
-    # Ces règles permettent de conserver les anciens liens fonctionnels
-    RewriteCond %{REQUEST_URI} ^/wikitips(/.*)?$ [NC]
-    RewriteRule ^(.*)$ /news%1 [R=301,L]
-
-    RewriteBase /
-    RewriteRule ^index\.php$ - [L]
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /index.php [L]
-</IfModule>
