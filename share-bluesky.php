@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (mb_strlen($text) > 300) {
         $error = 'Le texte ne doit pas dépasser 300 caractères.';
     } else {
-        $title = $article['title'];
-        $description = mb_substr($article['summary'] ?? '', 0, 150);
+        $title = html_entity_decode(strip_tags($article['title']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $description = mb_substr(html_entity_decode(strip_tags($article['summary'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8'), 0, 150);
 
         $result = $bluesky->createPost($text, $articleUrl, $title, $description);
 

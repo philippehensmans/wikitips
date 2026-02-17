@@ -192,11 +192,11 @@ class BlueskyService
         $blueskyPost = $article['bluesky_post'] ?? '';
 
         if (!empty($blueskyPost)) {
-            // Utiliser le texte accrocheur généré par Claude
-            $text = $blueskyPost;
+            // Utiliser le texte accrocheur généré par Claude (nettoyé des éventuelles balises/entités HTML)
+            $text = html_entity_decode(strip_tags($blueskyPost), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         } else {
             // Fallback: utiliser le titre + résumé tronqué (pour les anciens articles)
-            $title = $article['title'] ?? 'Article';
+            $title = html_entity_decode(strip_tags($article['title'] ?? 'Article'), ENT_QUOTES | ENT_HTML5, 'UTF-8');
             // Supprimer les balises HTML et décoder les entités du résumé
             $summary = html_entity_decode(strip_tags($article['summary'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
             $maxSummaryLength = 200;
@@ -220,7 +220,7 @@ class BlueskyService
     public function shareArticle(array $article, string $articleUrl): array
     {
         $text = $this->formatArticlePost($article, $articleUrl);
-        $title = $article['title'] ?? 'News';
+        $title = html_entity_decode(strip_tags($article['title'] ?? 'News'), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         // Supprimer les balises HTML et décoder les entités de la description
         $description = html_entity_decode(strip_tags($article['summary'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
