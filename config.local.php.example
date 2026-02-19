@@ -20,6 +20,10 @@ define('API_SECRET_KEY', 'votre-cle-secrete-aleatoire');
 // URL du site (sans slash final)
 define('SITE_URL', 'https://votre-domaine.com');
 
+// Token secret pour les appels cron via HTTP (cron-job.org)
+// Générez un token aléatoire, ex: bin2hex(random_bytes(32))
+define('CRON_SECRET_TOKEN', 'votre-token-cron-secret');
+
 // Nom et description du site (optionnel)
 // define('SITE_NAME', 'News - Mon Site');
 // define('SITE_DESCRIPTION', 'Ma description personnalisée');

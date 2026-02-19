@@ -74,6 +74,12 @@ if (!defined('NEWSLETTER_DAY')) {
     define('NEWSLETTER_DAY', 'monday'); // Jour d'envoi de la newsletter hebdomadaire
 }
 
+// Token secret pour les appels cron via HTTP (ex: cron-job.org)
+// Définissez un token aléatoire dans config.local.php
+if (!defined('CRON_SECRET_TOKEN')) {
+    define('CRON_SECRET_TOKEN', getenv('CRON_SECRET_TOKEN') ?: '');
+}
+
 // Ancien chemin de base (pour redirection automatique)
 // Si l'application était précédemment accessible sous /wikitips/,
 // les requêtes seront redirigées vers /news/
