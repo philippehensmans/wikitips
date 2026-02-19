@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $result = $mailchimp->sendWeeklyNewsletter($articlesWithCats);
             if ($result['success']) {
-                $alert = ['type' => 'success', 'message' => 'Newsletter envoyée avec succès à tous les abonnés !'];
+                $alert = ['type' => 'success', 'message' => 'Newsletter envoyée avec succès aux abonnés inscrits via le site !'];
 
                 // Logger l'envoi
                 $stmt = $db->prepare("INSERT INTO newsletter_logs (campaign_id, article_count, status) VALUES (?, ?, 'sent')");
@@ -92,6 +92,7 @@ $members = null;
 if ($mailchimp->isConfigured()) {
     $stats = $mailchimp->getListStats();
     $members = $mailchimp->getMembers(100);
+    $newsletterCount = $members['total_items'] ?? 0;
 }
 
 // Historique des envois
@@ -137,12 +138,12 @@ define('MAILCHIMP_LIST_ID', 'votre-audience-id');</pre>
             <div class="infobox-header"><?= htmlspecialchars($stats['name'] ?? 'Liste') ?></div>
             <div class="infobox-content">
                 <div class="infobox-row">
-                    <div class="infobox-label">Abonnés</div>
-                    <div class="infobox-value"><strong><?= $stats['member_count'] ?></strong></div>
+                    <div class="infobox-label">Abonnés newsletter</div>
+                    <div class="infobox-value"><strong><?= $newsletterCount ?></strong></div>
                 </div>
                 <div class="infobox-row">
-                    <div class="infobox-label">Désabonnés</div>
-                    <div class="infobox-value"><?= $stats['unsubscribe_count'] ?></div>
+                    <div class="infobox-label">Audience totale</div>
+                    <div class="infobox-value"><?= $stats['member_count'] ?></div>
                 </div>
                 <div class="infobox-row">
                     <div class="infobox-label">Taux ouverture</div>
@@ -170,7 +171,7 @@ define('MAILCHIMP_LIST_ID', 'votre-audience-id');</pre>
                 <div class="btn-group">
                     <button type="submit" name="action" value="send_test" class="btn">Aperçu</button>
                     <button type="submit" name="action" value="send_now" class="btn btn-primary"
-                            onclick="return confirm('Envoyer la newsletter à tous les abonnés ?');">
+                            onclick="return confirm('Envoyer la newsletter aux abonnés inscrits via le site ?');">
                         Envoyer maintenant
                     </button>
                 </div>
@@ -231,7 +232,7 @@ define('MAILCHIMP_LIST_ID', 'votre-audience-id');</pre>
 
         <?php if ($members && $members['success'] && !empty($members['members'])): ?>
             <p style="margin-bottom: 15px; font-size: 13px; color: #666;">
-                <?= $members['total_items'] ?> abonné(s) au total (les abonnés se gèrent directement sur Mailchimp).
+                <?= $members['total_items'] ?> abonné(s) à la newsletter (inscrits via le site).
             </p>
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>

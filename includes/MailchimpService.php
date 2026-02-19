@@ -132,7 +132,7 @@ class MailchimpService
     }
 
     /**
-     * Récupérer la liste des abonnés
+     * Récupérer les abonnés à la newsletter (ceux avec le tag newsletter-hebdo)
      */
     public function getMembers(int $count = 50, int $offset = 0): array
     {
@@ -140,8 +140,17 @@ class MailchimpService
             return ['success' => false, 'error' => 'Mailchimp n\'est pas configuré.'];
         }
 
+        $tagId = $this->getTagId(MAILCHIMP_NEWSLETTER_TAG);
+        if ($tagId === null) {
+            return [
+                'success' => true,
+                'members' => [],
+                'total_items' => 0
+            ];
+        }
+
         $response = $this->request(
-            "lists/{$this->listId}/members?count={$count}&offset={$offset}&status=subscribed",
+            "lists/{$this->listId}/segments/{$tagId}/members?count={$count}&offset={$offset}",
             null,
             'GET'
         );
