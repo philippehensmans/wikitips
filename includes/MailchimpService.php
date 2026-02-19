@@ -196,6 +196,17 @@ class MailchimpService
      */
     private function createCampaign(array $articles): array
     {
+        // Vérifier que le tag existe avant de créer la campagne
+        // pour ne jamais envoyer à toute l'audience par accident
+        $tagId = $this->getTagId(MAILCHIMP_NEWSLETTER_TAG);
+        if ($tagId === null) {
+            return [
+                'success' => false,
+                'error' => 'Le tag "' . MAILCHIMP_NEWSLETTER_TAG . '" n\'existe pas dans Mailchimp. '
+                         . 'Inscrivez au moins un abonné via le formulaire avant d\'envoyer.'
+            ];
+        }
+
         $articleCount = count($articles);
         $weekStart = date('d/m', strtotime('-7 days'));
         $weekEnd = date('d/m/Y');
@@ -212,7 +223,7 @@ class MailchimpService
                         'condition_type' => 'StaticSegment',
                         'field' => 'static_segment',
                         'op' => 'static_is',
-                        'value' => $this->getTagId(MAILCHIMP_NEWSLETTER_TAG)
+                        'value' => $tagId
                     ]]
                 ]
             ],
