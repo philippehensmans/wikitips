@@ -63,6 +63,9 @@ class MailchimpService
         );
 
         if (isset($response['id'])) {
+            // Ajouter le tag newsletter
+            $this->setTag($subscriberHash, MAILCHIMP_NEWSLETTER_TAG, 'active');
+
             return [
                 'success' => true,
                 'status' => $response['status'],
@@ -89,19 +92,17 @@ class MailchimpService
 
         $subscriberHash = md5(strtolower(trim($email)));
 
-        $response = $this->request(
-            "lists/{$this->listId}/members/{$subscriberHash}",
-            ['status' => 'unsubscribed'],
-            'PATCH'
-        );
+        // Retirer le tag newsletter (le contact reste dans l'audience)
+        $result = $this->setTag($subscriberHash, MAILCHIMP_NEWSLETTER_TAG, 'inactive');
 
-        if (isset($response['id']) && $response['status'] === 'unsubscribed') {
-            return ['success' => true, 'message' => 'Vous avez été désabonné.'];
+        // L'API retourne 204 No Content en cas de succès
+        if (empty($result) || !isset($result['detail'])) {
+            return ['success' => true, 'message' => 'Vous avez été désabonné de la newsletter.'];
         }
 
         return [
             'success' => false,
-            'error' => $response['detail'] ?? 'Erreur lors du désabonnement'
+            'error' => $result['detail'] ?? 'Erreur lors du désabonnement'
         ];
     }
 
@@ -204,7 +205,16 @@ class MailchimpService
         $data = [
             'type' => 'regular',
             'recipients' => [
-                'list_id' => $this->listId
+                'list_id' => $this->listId,
+                'segment_opts' => [
+                    'match' => 'all',
+                    'conditions' => [[
+                        'condition_type' => 'StaticSegment',
+                        'field' => 'static_segment',
+                        'op' => 'static_is',
+                        'value' => $this->getTagId(MAILCHIMP_NEWSLETTER_TAG)
+                    ]]
+                ]
             ],
             'settings' => [
                 'subject_line' => $subject,
@@ -390,6 +400,40 @@ HTML;
 </body>
 </html>
 HTML;
+    }
+
+    /**
+     * Ajouter ou retirer un tag sur un membre
+     */
+    private function setTag(string $subscriberHash, string $tagName, string $status): array
+    {
+        return $this->request(
+            "lists/{$this->listId}/members/{$subscriberHash}/tags",
+            ['tags' => [['name' => $tagName, 'status' => $status]]],
+            'POST'
+        );
+    }
+
+    /**
+     * Récupérer l'ID d'un tag (segment) par son nom
+     */
+    private function getTagId(string $tagName): ?int
+    {
+        $response = $this->request(
+            "lists/{$this->listId}/segments?type=static&count=100",
+            null,
+            'GET'
+        );
+
+        if (isset($response['segments'])) {
+            foreach ($response['segments'] as $segment) {
+                if (strcasecmp($segment['name'], $tagName) === 0) {
+                    return (int)$segment['id'];
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
