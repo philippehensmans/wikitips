@@ -179,6 +179,10 @@ class MailchimpService
             return ['success' => false, 'error' => 'Aucun article à envoyer.'];
         }
 
+        if (preg_match('#^https?://localhost(:|/)#', SITE_URL)) {
+            return ['success' => false, 'error' => 'SITE_URL pointe vers localhost (' . SITE_URL . '). Définissez SITE_URL dans config.local.php ou via la variable d\'environnement SITE_URL.'];
+        }
+
         // 1. Créer la campagne
         $campaign = $this->createCampaign($articles);
         if (!$campaign['success']) {
