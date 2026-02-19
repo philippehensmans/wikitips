@@ -38,7 +38,15 @@ if (!defined('SITE_DESCRIPTION')) {
     define('SITE_DESCRIPTION', 'Veille et analyse sous l\'angle des droits humains');
 }
 if (!defined('SITE_URL')) {
-    define('SITE_URL', 'http://localhost:8080');
+    $siteUrlEnv = getenv('SITE_URL');
+    if ($siteUrlEnv) {
+        define('SITE_URL', rtrim($siteUrlEnv, '/'));
+    } elseif (!empty($_SERVER['HTTP_HOST'])) {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        define('SITE_URL', $scheme . '://' . $_SERVER['HTTP_HOST']);
+    } else {
+        define('SITE_URL', 'http://localhost:8080');
+    }
 }
 
 // Configuration de sécurité
