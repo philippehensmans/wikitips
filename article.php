@@ -161,65 +161,6 @@ ob_start();
 </div>
 <?php endif; ?>
 
-<?php
-// Génération automatique de la recension si elle n'existe pas
-$reviewData = null;
-$reviewError = null;
-
-if (empty($article['review_phh'])) {
-    // Vérifier que Claude API est configuré
-    if (CLAUDE_API_KEY !== 'YOUR_API_KEY_HERE') {
-        $claude = new ClaudeService();
-        $result = $claude->generateReview($article);
-
-        if (isset($result['error'])) {
-            $reviewError = $result['error'];
-        } else {
-            // Stocker la recension en base de données
-            $reviewData = $result;
-            $articleModel->update($article['id'], [
-                'review_phh' => json_encode($result)
-            ]);
-        }
-    }
-} else {
-    // Charger la recension existante
-    $reviewData = json_decode($article['review_phh'], true);
-}
-
-if ($reviewData): ?>
-<div class="article-section">
-    <h2>Recension</h2>
-    <div class="review-header">
-        <h3><?= htmlspecialchars($reviewData['titre'] ?? 'Sans titre') ?></h3>
-        <div class="review-meta">
-            <span>~<?= $reviewData['nombre_signes'] ?? 4000 ?> signes (hors espaces)</span>
-            <button type="button" class="btn btn-small" onclick="copyReviewToClipboard()">📋 Copier</button>
-        </div>
-    </div>
-    <div class="review-content">
-        <p class="review-chapo"><strong><?= htmlspecialchars($reviewData['chapo'] ?? '') ?></strong></p>
-        <?php foreach ($reviewData['sections'] ?? [] as $section): ?>
-        <h3 class="review-intertitre"><?= htmlspecialchars($section['intertitre'] ?? '') ?></h3>
-        <p><?= htmlspecialchars($section['contenu'] ?? '') ?></p>
-        <?php endforeach; ?>
-        <?php if (!empty($article['source_url'])): ?>
-        <p class="review-source"><strong>Source :</strong> <a href="<?= htmlspecialchars($article['source_url']) ?>" target="_blank"><?= htmlspecialchars($article['source_url']) ?></a></p>
-        <?php endif; ?>
-        <?php if (!empty($reviewData['hashtags'])): ?>
-        <p class="review-hashtags"><?= htmlspecialchars(implode(' ', $reviewData['hashtags'])) ?></p>
-        <?php endif; ?>
-    </div>
-</div>
-<?php elseif ($reviewError): ?>
-<div class="article-section">
-    <h2>Recension</h2>
-    <div class="error-message">
-        ✗ Erreur lors de la génération : <?= htmlspecialchars($reviewError) ?>
-    </div>
-</div>
-<?php endif; ?>
-
 <?php if ($article['human_rights_analysis']): ?>
 <div class="human-rights-box">
     <h3>Analyse sous l'angle des droits humains</h3>
@@ -244,9 +185,6 @@ if ($reviewData): ?>
 <?php endif; ?>
 
 <script>
-// Données pour la copie de la recension
-const reviewPlainText = <?= json_encode($reviewData ? ($reviewData['plain_text'] ?? '') : '') ?>;
-
 // Données pour le partage Facebook
 const facebookText = <?= json_encode($facebookText) ?>;
 const facebookUrl = <?= json_encode($facebookUrl) ?>;
@@ -292,21 +230,6 @@ function shareOnLinkedin() {
         document.body.removeChild(textarea);
         window.open(linkedinUrl, '_blank', 'width=600,height=500');
         alert('📋 Texte copié dans le presse-papiers !\n\nCollez-le (Ctrl+V) dans votre publication LinkedIn.');
-    });
-}
-
-function copyReviewToClipboard() {
-    navigator.clipboard.writeText(reviewPlainText).then(() => {
-        alert('Recension copiée dans le presse-papiers !');
-    }).catch(err => {
-        // Fallback pour les navigateurs sans clipboard API
-        const textarea = document.createElement('textarea');
-        textarea.value = reviewPlainText;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        alert('Recension copiée dans le presse-papiers !');
     });
 }
 
