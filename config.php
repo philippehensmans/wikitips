@@ -58,6 +58,22 @@ if (!defined('BLUESKY_AUTO_SHARE')) {
     define('BLUESKY_AUTO_SHARE', false); // Partage automatique à la création d'article
 }
 
+// Configuration Mailchimp
+// Créez un compte sur https://mailchimp.com et obtenez une API key
+// L'API key se trouve dans Account > Extras > API keys
+if (!defined('MAILCHIMP_API_KEY')) {
+    define('MAILCHIMP_API_KEY', getenv('MAILCHIMP_API_KEY') ?: '');
+}
+if (!defined('MAILCHIMP_LIST_ID')) {
+    define('MAILCHIMP_LIST_ID', getenv('MAILCHIMP_LIST_ID') ?: ''); // Audience/List ID
+}
+if (!defined('MAILCHIMP_FROM_NAME')) {
+    define('MAILCHIMP_FROM_NAME', SITE_NAME);
+}
+if (!defined('NEWSLETTER_DAY')) {
+    define('NEWSLETTER_DAY', 'monday'); // Jour d'envoi de la newsletter hebdomadaire
+}
+
 // Ancien chemin de base (pour redirection automatique)
 // Si l'application était précédemment accessible sous /wikitips/,
 // les requêtes seront redirigées vers /news/

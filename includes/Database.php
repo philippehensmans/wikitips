@@ -134,6 +134,17 @@ class Database {
             )
         ");
 
+        // Table de suivi des newsletters envoyées
+        $this->pdo->exec("
+            CREATE TABLE IF NOT EXISTS newsletter_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                campaign_id TEXT,
+                article_count INTEGER DEFAULT 0,
+                sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                status TEXT DEFAULT 'sent'
+            )
+        ");
+
         // Créer la page d'accueil par défaut si elle n'existe pas
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM pages WHERE slug = 'home'");
         if ((int)$stmt->fetchColumn() === 0) {
