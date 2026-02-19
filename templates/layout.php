@@ -125,10 +125,18 @@
                     <li><a href="<?= url('api/index.php?action=health') ?>" target="_blank">État de l'API</a></li>
                     <?php if ($auth->isAdmin()): ?>
                         <li><a href="<?= url('users.php') ?>">Gérer les utilisateurs</a></li>
+                        <li><a href="<?= url('subscribers.php') ?>">Newsletter / Abonnés</a></li>
                     <?php endif; ?>
                 </ul>
             </div>
             <?php endif; ?>
+
+            <div class="sidebar-section">
+                <h3>Newsletter</h3>
+                <ul>
+                    <li><a href="<?= url('newsletter.php') ?>">S'inscrire</a></li>
+                </ul>
+            </div>
 
             <?php if (!$isLoggedIn): ?>
             <div class="sidebar-section">
