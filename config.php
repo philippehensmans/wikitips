@@ -111,11 +111,16 @@ if (defined('OLD_BASE_PATH') && OLD_BASE_PATH !== '' && preg_match('#^' . preg_q
 // Chemin de base (auto-détecté ou défini manuellement)
 // Ex: si installé dans /news/, définir BASE_PATH = '/news'
 if (!defined('BASE_PATH')) {
-    // Auto-détection du chemin de base
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-    $basePath = rtrim(dirname($scriptName), '/');
-    // Éviter les doubles slashes pour la racine
-    define('BASE_PATH', $basePath === '/' ? '' : $basePath);
+    $basePathEnv = getenv('BASE_PATH');
+    if ($basePathEnv !== false) {
+        define('BASE_PATH', rtrim($basePathEnv, '/'));
+    } else {
+        // Auto-détection du chemin de base
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $basePath = rtrim(dirname($scriptName), '/');
+        // Éviter les doubles slashes pour la racine
+        define('BASE_PATH', $basePath === '/' ? '' : $basePath);
+    }
 }
 
 /**
