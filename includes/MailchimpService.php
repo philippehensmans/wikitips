@@ -310,6 +310,7 @@ class MailchimpService
     {
         $siteName = SITE_NAME;
         $siteUrl = SITE_URL;
+        $baseUrl = $siteUrl . (defined('BASE_PATH') ? BASE_PATH : '');
         $weekStart = date('d/m', strtotime('-7 days'));
         $weekEnd = date('d/m/Y');
         $articleCount = count($articles);
@@ -317,7 +318,7 @@ class MailchimpService
         $articlesHtml = '';
         foreach ($articles as $article) {
             $title = htmlspecialchars($article['title']);
-            $articleUrl = $siteUrl . '/article.php?slug=' . htmlspecialchars($article['slug']);
+            $articleUrl = $baseUrl . '/article.php?slug=' . htmlspecialchars($article['slug']);
 
             // Résumé court (200 caractères max)
             $summary = '';
@@ -400,7 +401,7 @@ HTML;
                     <!-- CTA -->
                     <tr>
                         <td style="padding: 25px 30px;" align="center">
-                            <a href="{$siteUrl}" style="display: inline-block; background-color: #3366cc; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-size: 14px;">
+                            <a href="{$baseUrl}" style="display: inline-block; background-color: #3366cc; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-size: 14px;">
                                 Voir tous les articles
                             </a>
                         </td>
