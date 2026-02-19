@@ -179,9 +179,12 @@ define('MAILCHIMP_LIST_ID', 'votre-audience-id');</pre>
 
             <?php if (isset($alert) && $alert['type'] === 'success' && file_exists(__DIR__ . '/data/newsletter-preview.html')): ?>
                 <div style="margin-top: 15px;">
-                    <a href="<?= url('data/newsletter-preview.html') ?>" target="_blank" class="btn">
-                        Voir l'aperçu dans un nouvel onglet
-                    </a>
+                    <button type="button" class="btn" onclick="document.getElementById('newsletter-preview').style.display = document.getElementById('newsletter-preview').style.display === 'none' ? 'block' : 'none'">
+                        Afficher / masquer l'aperçu
+                    </button>
+                    <div id="newsletter-preview" style="display: none; margin-top: 15px; border: 1px solid #ccc; border-radius: 4px; background: #fff;">
+                        <iframe srcdoc="<?= htmlspecialchars(file_get_contents(__DIR__ . '/data/newsletter-preview.html')) ?>" style="width: 100%; height: 600px; border: none;"></iframe>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>
