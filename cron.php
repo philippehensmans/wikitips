@@ -24,9 +24,13 @@ header('Content-Type: text/plain; charset=utf-8');
 
 // Vérifier le token secret
 $token = $_GET['token'] ?? '';
-if (CRON_SECRET_TOKEN === '' || !hash_equals(CRON_SECRET_TOKEN, $token)) {
+if (CRON_SECRET_TOKEN === '') {
+    http_response_code(500);
+    die('CRON_SECRET_TOKEN non configuré. Ajoutez-le dans config.local.php');
+}
+if (!hash_equals(CRON_SECRET_TOKEN, $token)) {
     http_response_code(403);
-    die('Accès refusé.');
+    die('Token invalide.');
 }
 
 // Router vers la bonne action
