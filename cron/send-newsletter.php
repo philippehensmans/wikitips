@@ -6,50 +6,30 @@
  * Envoie un récapitulatif des articles publiés dans les 7 derniers jours
  * via Mailchimp à tous les abonnés de la liste.
  *
- * Deux modes d'exécution :
+ * Exécution CLI uniquement (pour cron serveur) :
+ *   0 9 * * 1 php /chemin/vers/wikitips/cron/send-newsletter.php
  *
- * 1) CLI (cron serveur) - tous les lundis à 9h :
- *    0 9 * * 1 php /chemin/vers/wikitips/cron/send-newsletter.php
+ * Pour l'exécution via HTTP (cron-job.org), utilisez cron.php à la racine.
  *
- * 2) HTTP (cron-job.org) - appel via URL avec token secret :
- *    https://votre-site.be/cron/send-newsletter.php?token=VOTRE_TOKEN
- *
- * Options CLI / Paramètres GET :
- *   --dry-run / ?dry-run     Affiche le contenu sans envoyer
- *   --days=N  / ?days=N      Nombre de jours à couvrir (défaut: 7)
- *   --force   / ?force       Envoie même si une newsletter a déjà été envoyée cette semaine
+ * Options :
+ *   --dry-run    Affiche le contenu sans envoyer
+ *   --days=N     Nombre de jours à couvrir (défaut: 7)
+ *   --force      Envoie même si une newsletter a déjà été envoyée cette semaine
  */
 
-// Déterminer le mode d'exécution (CLI ou HTTP)
-$isCli = (php_sapi_name() === 'cli');
-
-if (!$isCli) {
-    // Mode HTTP : vérifier le token secret
-    require_once __DIR__ . '/../config.php';
-
-    $token = $_GET['token'] ?? '';
-    if (CRON_SECRET_TOKEN === '' || !hash_equals(CRON_SECRET_TOKEN, $token)) {
-        http_response_code(403);
-        die('Accès refusé.');
-    }
-
-    // En mode HTTP, capturer la sortie pour la renvoyer en texte
-    header('Content-Type: text/plain; charset=utf-8');
-} else {
-    require_once __DIR__ . '/../config.php';
+// Exécution CLI uniquement — pour HTTP, utiliser cron.php à la racine
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die('Ce script est réservé au CLI. Pour les appels HTTP, utilisez cron.php à la racine.');
 }
 
-// Parser les options (CLI) ou paramètres GET (HTTP)
-if ($isCli) {
-    $options = getopt('', ['dry-run', 'days:', 'force']);
-    $dryRun = isset($options['dry-run']);
-    $days = isset($options['days']) ? (int)$options['days'] : 7;
-    $force = isset($options['force']);
-} else {
-    $dryRun = isset($_GET['dry-run']);
-    $days = isset($_GET['days']) ? (int)$_GET['days'] : 7;
-    $force = isset($_GET['force']);
-}
+require_once __DIR__ . '/../config.php';
+
+// Parser les options
+$options = getopt('', ['dry-run', 'days:', 'force']);
+$dryRun = isset($options['dry-run']);
+$days = isset($options['days']) ? (int)$options['days'] : 7;
+$force = isset($options['force']);
 
 echo "=== Newsletter " . SITE_NAME . " ===\n";
 echo "Date: " . date('d/m/Y H:i') . "\n";
