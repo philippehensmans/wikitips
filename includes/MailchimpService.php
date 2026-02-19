@@ -44,7 +44,7 @@ class MailchimpService
 
         $data = [
             'email_address' => $email,
-            'status' => 'pending', // Double opt-in
+            'status_if_new' => 'pending', // Double opt-in pour les nouveaux uniquement
             'merge_fields' => []
         ];
 
