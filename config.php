@@ -73,6 +73,9 @@ if (!defined('MAILCHIMP_FROM_NAME')) {
 if (!defined('NEWSLETTER_DAY')) {
     define('NEWSLETTER_DAY', 'monday'); // Jour d'envoi de la newsletter hebdomadaire
 }
+if (!defined('MAILCHIMP_NEWSLETTER_TAG')) {
+    define('MAILCHIMP_NEWSLETTER_TAG', 'newsletter-hebdo'); // Tag pour cibler les abonnés newsletter
+}
 
 // Token secret pour les appels cron via HTTP (ex: cron-job.org)
 // Définissez un token aléatoire dans config.local.php
