@@ -20,7 +20,7 @@
     <?php endif; ?>
 
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= time() ?>">
-    <link rel="icon" href="<?= url('assets/images/favicon.ico') ?>" type="image/x-icon">
+    <link rel="icon" href="<?= url('assets/images/favicon.svg') ?>" type="image/svg+xml">
     <!-- Matomo -->
     <script>
       var _paq = window._paq = window._paq || [];
