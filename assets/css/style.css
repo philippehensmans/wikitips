@@ -343,6 +343,18 @@ a:hover {
     border-radius: 2px;
 }
 
+.country-tag {
+    display: inline-block;
+    background: #e8f4fd;
+    border: 1px solid #a8d4f0;
+    color: #1a5276;
+    padding: 2px 8px;
+    margin: 2px;
+    border-radius: 2px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
 /* Source box */
 .source-box {
     background: var(--wiki-bg-light);

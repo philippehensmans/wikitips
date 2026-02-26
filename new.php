@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $alert = ['type' => 'error', 'message' => 'Le titre est requis.'];
     } else {
         $ogImageField = trim($_POST['og_image'] ?? '');
+        $countryField = trim($_POST['country'] ?? '');
 
         // Si pas d'image og:image manuelle, tenter de la récupérer depuis la source
         if (empty($ogImageField) && !empty($sourceUrl)) {
@@ -51,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'source_url' => $sourceUrl,
             'status' => $status,
             'og_image' => $ogImageField ?: null,
+            'country' => $countryField ?: null,
             'categories' => array_map('intval', $categoryIds)
         ]);
 
@@ -105,6 +107,12 @@ ob_start();
             <label for="og_image">Image de partage (og:image)</label>
             <input type="url" id="og_image" name="og_image" placeholder="https://example.com/image.jpg" value="<?= htmlspecialchars($_POST['og_image'] ?? '') ?>">
             <p class="help-text">Optionnel. Si vide, l'image sera récupérée automatiquement depuis l'URL source.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="country">Pays concerné</label>
+            <input type="text" id="country" name="country" placeholder="Ex: France, Palestine, Ukraine..." value="<?= htmlspecialchars($_POST['country'] ?? '') ?>">
+            <p class="help-text">Optionnel. Détecté automatiquement lors de l'import via l'analyse IA.</p>
         </div>
 
         <div class="form-group">

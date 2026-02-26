@@ -16,8 +16,8 @@ class Article {
         $slug = $this->generateSlug($data['title']);
 
         $stmt = $this->db->prepare("
-            INSERT INTO articles (title, slug, source_url, source_content, summary, bluesky_post, main_points, human_rights_analysis, content, status, og_image)
-            VALUES (:title, :slug, :source_url, :source_content, :summary, :bluesky_post, :main_points, :human_rights_analysis, :content, :status, :og_image)
+            INSERT INTO articles (title, slug, source_url, source_content, summary, bluesky_post, main_points, human_rights_analysis, content, status, og_image, country)
+            VALUES (:title, :slug, :source_url, :source_content, :summary, :bluesky_post, :main_points, :human_rights_analysis, :content, :status, :og_image, :country)
         ");
 
         $stmt->execute([
@@ -31,7 +31,8 @@ class Article {
             'human_rights_analysis' => $data['human_rights_analysis'] ?? null,
             'content' => $data['content'] ?? null,
             'status' => $data['status'] ?? 'draft',
-            'og_image' => $data['og_image'] ?? null
+            'og_image' => $data['og_image'] ?? null,
+            'country' => $data['country'] ?? null
         ]);
 
         $articleId = (int)$this->db->lastInsertId();
@@ -51,7 +52,7 @@ class Article {
         $fields = [];
         $params = ['id' => $id];
 
-        $allowedFields = ['title', 'source_url', 'source_content', 'summary', 'bluesky_post', 'main_points', 'human_rights_analysis', 'content', 'status', 'review_phh', 'og_image'];
+        $allowedFields = ['title', 'source_url', 'source_content', 'summary', 'bluesky_post', 'main_points', 'human_rights_analysis', 'content', 'status', 'review_phh', 'og_image', 'country'];
 
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {

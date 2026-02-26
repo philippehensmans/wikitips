@@ -44,6 +44,9 @@ ob_start();
                 <?php endif; ?>
                 <div class="meta">
                     <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
+                    <?php if (!empty($article['country'])): ?>
+                        | <span class="country-tag"><?= htmlspecialchars($article['country']) ?></span>
+                    <?php endif; ?>
                     <?php if (!empty($article['categories'])): ?>
                         |
                         <?php foreach ($article['categories'] as $cat): ?>
