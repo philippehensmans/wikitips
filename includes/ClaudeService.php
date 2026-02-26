@@ -76,7 +76,8 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans ```json) cont
         "overall_assessment": "Évaluation globale sous l'angle des droits humains (2-3 phrases)",
         "recommendations": ["Recommandation 1", "Recommandation 2"]
     },
-    "suggested_categories": ["droits-civils-politiques", "non-discrimination"]
+    "suggested_categories": ["droits-civils-politiques", "non-discrimination"],
+    "country": "Pays principal concerné par l'article (nom du pays en français, ex: 'France', 'États-Unis', 'Palestine', 'Israël', 'Ukraine', 'Russie', etc.). Si plusieurs pays sont concernés, indiquer le pays principal. Si l'article concerne une région ou est global, indiquer 'International'. Ne jamais laisser vide."
 }
 
 Les catégories disponibles sont: droits-civils-politiques, droits-economiques-sociaux, droits-culturels, droit-humanitaire, droits-refugies, droits-enfants, droits-femmes, non-discrimination
@@ -174,7 +175,8 @@ PROMPT;
             'main_points_raw' => $data['main_points'] ?? [],
             'human_rights_analysis' => $analysisHtml,
             'human_rights_analysis_raw' => $data['human_rights_analysis'] ?? [],
-            'suggested_categories' => $data['suggested_categories'] ?? []
+            'suggested_categories' => $data['suggested_categories'] ?? [],
+            'country' => $data['country'] ?? null
         ];
     }
 

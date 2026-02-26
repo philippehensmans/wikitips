@@ -68,6 +68,9 @@ class Database {
         // Migration: Ajouter la colonne og_image pour l'image de partage réseaux sociaux
         $this->addColumnIfNotExists('articles', 'og_image', 'TEXT');
 
+        // Migration: Ajouter la colonne country pour le pays concerné par l'article
+        $this->addColumnIfNotExists('articles', 'country', 'TEXT');
+
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

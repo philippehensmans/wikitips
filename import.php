@@ -58,7 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'human_rights_analysis' => $result['human_rights_analysis'],
                     'categories' => $categoryIds,
                     'status' => 'draft',
-                    'og_image' => $ogImage
+                    'og_image' => $ogImage,
+                    'country' => $result['country'] ?? null
                 ]);
 
                 $newArticle = $articleModel->getById($articleId);

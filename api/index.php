@@ -239,7 +239,8 @@ function handleAnalyze(string $method, array $input): array {
             'human_rights_analysis' => $result['human_rights_analysis'],
             'categories' => $categoryIds,
             'status' => 'draft',
-            'og_image' => $ogImage
+            'og_image' => $ogImage,
+            'country' => $result['country'] ?? null
         ]);
 
         $result['article_id'] = $articleId;

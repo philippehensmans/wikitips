@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $alert = ['type' => 'error', 'message' => 'Le titre est requis.'];
     } else {
         $ogImageField = trim($_POST['og_image'] ?? '');
+        $countryField = trim($_POST['country'] ?? '');
 
         $articleModel->update($id, [
             'title' => $title,
@@ -55,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'source_url' => $sourceUrl,
             'status' => $status,
             'og_image' => $ogImageField ?: null,
+            'country' => $countryField ?: null,
             'categories' => array_map('intval', $categoryIds)
         ]);
 
@@ -98,6 +100,12 @@ ob_start();
             <?php if (!empty($article['source_url']) && empty($article['og_image'])): ?>
             <button type="button" class="btn" style="margin-top: 8px;" onclick="fetchOgImageFromSource()">Récupérer depuis la source</button>
             <?php endif; ?>
+        </div>
+
+        <div class="form-group">
+            <label for="country">Pays concerné</label>
+            <input type="text" id="country" name="country" placeholder="Ex: France, Palestine, Ukraine..." value="<?= htmlspecialchars($article['country'] ?? '') ?>">
+            <p class="help-text">Pays principal concerné par l'article. Détecté automatiquement lors de l'import.</p>
         </div>
 
         <div class="form-group">
