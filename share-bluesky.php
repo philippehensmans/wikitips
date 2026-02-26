@@ -50,8 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $title = $article['title'];
         $description = mb_substr($article['summary'] ?? '', 0, 150);
+        $thumbUrl = $article['og_image'] ?? null;
 
-        $result = $bluesky->createPost($text, $articleUrl, $title, $description);
+        $result = $bluesky->createPost($text, $articleUrl, $title, $description, $thumbUrl);
 
         if ($result['success']) {
             // Rediriger vers l'article avec message de succès
