@@ -45,7 +45,7 @@ ob_start();
                 <div class="meta">
                     <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
                     <?php if (!empty($article['country'])): ?>
-                        | <span class="country-tag"><?= htmlspecialchars($article['country']) ?></span>
+                        | <a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a>
                     <?php endif; ?>
                     <?php if (!empty($article['categories'])): ?>
                         |

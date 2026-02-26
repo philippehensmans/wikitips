@@ -151,6 +151,45 @@ class Article {
     }
 
     /**
+     * Récupérer tous les articles d'un pays
+     */
+    public function getByCountry(string $country, string $status = null): array {
+        $sql = "SELECT * FROM articles WHERE country = :country";
+        $params = ['country' => $country];
+
+        if ($status) {
+            $sql .= " AND status = :status";
+            $params['status'] = $status;
+        }
+
+        $sql .= " ORDER BY created_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $articles = $stmt->fetchAll();
+
+        foreach ($articles as &$article) {
+            $article['categories'] = $this->getCategories($article['id']);
+        }
+
+        return $articles;
+    }
+
+    /**
+     * Récupérer la liste des pays avec le nombre d'articles
+     */
+    public function getAllCountries(): array {
+        $stmt = $this->db->query("
+            SELECT country, COUNT(*) as article_count
+            FROM articles
+            WHERE country IS NOT NULL AND country != ''
+            GROUP BY country
+            ORDER BY article_count DESC, country ASC
+        ");
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Rechercher des articles
      */
     public function search(string $query): array {

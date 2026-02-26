@@ -121,7 +121,7 @@ ob_start();
     <div class="article-meta">
         <span class="status-badge status-<?= $article['status'] ?>"><?= $article['status'] === 'published' ? 'Publié' : 'Brouillon' ?></span>
         <?php if (!empty($article['country'])): ?>
-            &bull; <span class="country-tag"><?= htmlspecialchars($article['country']) ?></span>
+            &bull; <a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a>
         <?php endif; ?>
         &bull; Créé le <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
         <?php if ($article['updated_at'] !== $article['created_at']): ?>
@@ -150,7 +150,7 @@ ob_start();
         <?php if (!empty($article['country'])): ?>
         <div class="infobox-row">
             <div class="infobox-label">Pays</div>
-            <div class="infobox-value"><span class="country-tag"><?= htmlspecialchars($article['country']) ?></span></div>
+            <div class="infobox-value"><a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a></div>
         </div>
         <?php endif; ?>
         <?php if (!empty($article['categories'])): ?>
