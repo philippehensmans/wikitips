@@ -56,7 +56,7 @@ class BlueskyService
     /**
      * Publie un post sur Bluesky
      */
-    public function createPost(string $text, ?string $url = null, ?string $title = null, ?string $description = null): array
+    public function createPost(string $text, ?string $url = null, ?string $title = null, ?string $description = null, ?string $thumbUrl = null): array
     {
         if (!$this->authenticate()) {
             return ['success' => false, 'error' => 'Authentification Bluesky échouée. Vérifiez vos identifiants.'];
@@ -78,7 +78,7 @@ class BlueskyService
 
         // Ajouter une carte de lien si URL fournie
         if ($url) {
-            $embed = $this->createLinkEmbed($url, $title, $description);
+            $embed = $this->createLinkEmbed($url, $title, $description, $thumbUrl);
             if ($embed) {
                 $post['embed'] = $embed;
             }
@@ -111,17 +111,95 @@ class BlueskyService
     }
 
     /**
-     * Crée un embed de type lien externe
+     * Upload une image comme blob sur Bluesky
+     * Retourne le blob reference ou null en cas d'échec
      */
-    private function createLinkEmbed(string $url, ?string $title = null, ?string $description = null): ?array
+    private function uploadImageBlob(string $imageUrl): ?array
     {
+        // Télécharger l'image
+        $ch = curl_init($imageUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 5,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; WikiTips/1.0)',
+        ]);
+        $imageData = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+        curl_close($ch);
+
+        if (!$imageData || $httpCode !== 200) {
+            return null;
+        }
+
+        // Déterminer le type MIME
+        $mimeType = $contentType ?: 'image/jpeg';
+        // Nettoyer le type MIME (enlever charset etc.)
+        if (strpos($mimeType, ';') !== false) {
+            $mimeType = trim(explode(';', $mimeType)[0]);
+        }
+
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($mimeType, $allowedMimes)) {
+            $mimeType = 'image/jpeg';
+        }
+
+        // Limiter à 1 Mo pour Bluesky
+        if (strlen($imageData) > 1000000) {
+            return null;
+        }
+
+        // Upload vers Bluesky
+        $url = "{$this->apiUrl}/com.atproto.repo.uploadBlob";
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $imageData,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                "Content-Type: {$mimeType}",
+                "Authorization: Bearer {$this->accessJwt}",
+            ],
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200) {
+            return null;
+        }
+
+        $decoded = json_decode($response, true);
+        return $decoded['blob'] ?? null;
+    }
+
+    /**
+     * Crée un embed de type lien externe avec vignette optionnelle
+     */
+    private function createLinkEmbed(string $url, ?string $title = null, ?string $description = null, ?string $thumbUrl = null): ?array
+    {
+        $external = [
+            'uri' => $url,
+            'title' => $title ?? $url,
+            'description' => $description ?? ''
+        ];
+
+        // Ajouter la vignette si disponible
+        if ($thumbUrl) {
+            $blob = $this->uploadImageBlob($thumbUrl);
+            if ($blob) {
+                $external['thumb'] = $blob;
+            }
+        }
+
         return [
             '$type' => 'app.bsky.embed.external',
-            'external' => [
-                'uri' => $url,
-                'title' => $title ?? $url,
-                'description' => $description ?? ''
-            ]
+            'external' => $external
         ];
     }
 
@@ -228,7 +306,10 @@ class BlueskyService
             $description = mb_substr($description, 0, 147) . '...';
         }
 
-        return $this->createPost($text, $articleUrl, $title, $description);
+        // Utiliser l'image og:image de l'article comme vignette
+        $thumbUrl = $article['og_image'] ?? null;
+
+        return $this->createPost($text, $articleUrl, $title, $description, $thumbUrl);
     }
 
     /**
