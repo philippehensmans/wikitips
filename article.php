@@ -47,6 +47,16 @@ if (!empty($article['summary'])) {
     $ogDescription = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 }
 
+// Image Open Graph pour les réseaux sociaux
+// Priorité : og_image stocké > première image du contenu > première image du résumé
+if (!empty($article['og_image'])) {
+    $ogImage = $article['og_image'];
+} else {
+    $ogImage = extractFirstImage($article['content'] ?? '')
+        ?? extractFirstImage($article['summary'] ?? '')
+        ?? extractFirstImage($article['main_points'] ?? '');
+}
+
 // Message WhatsApp
 $whatsappText = "📰 " . $article['title'] . "\n\n";
 if (!empty($article['summary'])) {

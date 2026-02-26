@@ -44,6 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($title)) {
         $alert = ['type' => 'error', 'message' => 'Le titre est requis.'];
     } else {
+        $ogImageField = trim($_POST['og_image'] ?? '');
+
         $articleModel->update($id, [
             'title' => $title,
             'summary' => $summary,
@@ -52,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'content' => $contentField,
             'source_url' => $sourceUrl,
             'status' => $status,
+            'og_image' => $ogImageField ?: null,
             'categories' => array_map('intval', $categoryIds)
         ]);
 
@@ -81,6 +84,20 @@ ob_start();
         <div class="form-group">
             <label for="source_url">URL source</label>
             <input type="url" id="source_url" name="source_url" placeholder="https://..." value="<?= htmlspecialchars($article['source_url'] ?? '') ?>">
+        </div>
+
+        <div class="form-group">
+            <label for="og_image">Image de partage (og:image)</label>
+            <input type="url" id="og_image" name="og_image" placeholder="https://example.com/image.jpg" value="<?= htmlspecialchars($article['og_image'] ?? '') ?>">
+            <p class="help-text">URL de l'image affichée lors du partage sur Facebook, LinkedIn, WhatsApp, etc. Récupérée automatiquement depuis la source lors de l'import.</p>
+            <?php if (!empty($article['og_image'])): ?>
+            <div style="margin-top: 8px;">
+                <img src="<?= htmlspecialchars($article['og_image']) ?>" alt="Aperçu og:image" style="max-width: 300px; max-height: 200px; border: 1px solid #a2a9b1; border-radius: 4px;">
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($article['source_url']) && empty($article['og_image'])): ?>
+            <button type="button" class="btn" style="margin-top: 8px;" onclick="fetchOgImageFromSource()">Récupérer depuis la source</button>
+            <?php endif; ?>
         </div>
 
         <div class="form-group">
@@ -184,6 +201,39 @@ tinymce.init({
         });
     }
 });
+
+function fetchOgImageFromSource() {
+    var sourceUrl = document.getElementById('source_url').value;
+    if (!sourceUrl) {
+        alert('Veuillez renseigner l\'URL source d\'abord.');
+        return;
+    }
+    var btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Recherche en cours...';
+
+    fetch('<?= url('api/index.php?action=fetch-og-image') ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: sourceUrl })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        btn.disabled = false;
+        btn.textContent = 'Récupérer depuis la source';
+        if (data.success && data.og_image) {
+            document.getElementById('og_image').value = data.og_image;
+            alert('Image trouvée et ajoutée !');
+        } else {
+            alert('Aucune image og:image trouvée sur cette page.');
+        }
+    })
+    .catch(function() {
+        btn.disabled = false;
+        btn.textContent = 'Récupérer depuis la source';
+        alert('Erreur lors de la récupération.');
+    });
+}
 
 function confirmDelete() {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
