@@ -65,6 +65,9 @@ class Database {
         // Migration: Ajouter la colonne review_phh pour stocker la recension générée
         $this->addColumnIfNotExists('articles', 'review_phh', 'TEXT');
 
+        // Migration: Ajouter la colonne og_image pour l'image de partage réseaux sociaux
+        $this->addColumnIfNotExists('articles', 'og_image', 'TEXT');
+
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

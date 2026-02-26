@@ -131,6 +131,66 @@ function url(string $path = ''): string {
     return BASE_PATH . '/' . $path;
 }
 
+/**
+ * Récupère l'image og:image d'une URL source
+ * Tente d'abord og:image, puis twitter:image, puis la première <img> de la page
+ */
+function fetchOgImage(string $url): ?string {
+    if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+        return null;
+    }
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS => 5,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; WikiTips/1.0)',
+        CURLOPT_SSL_VERIFYPEER => true,
+    ]);
+
+    $html = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if (!$html || $httpCode !== 200) {
+        return null;
+    }
+
+    // Chercher og:image
+    if (preg_match('/<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']/i', $html, $matches)) {
+        return $matches[1];
+    }
+    // Variante avec content avant property
+    if (preg_match('/<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']/i', $html, $matches)) {
+        return $matches[1];
+    }
+
+    // Chercher twitter:image
+    if (preg_match('/<meta[^>]+(?:name|property)=["\']twitter:image["\'][^>]+content=["\']([^"\']+)["\']/i', $html, $matches)) {
+        return $matches[1];
+    }
+    if (preg_match('/<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:name|property)=["\']twitter:image["\']/i', $html, $matches)) {
+        return $matches[1];
+    }
+
+    return null;
+}
+
+/**
+ * Extrait la première image d'un contenu HTML
+ */
+function extractFirstImage(string $html): ?string {
+    if (empty($html)) {
+        return null;
+    }
+    if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', $html, $matches)) {
+        return $matches[1];
+    }
+    return null;
+}
+
 // Démarrer la session tôt pour éviter "headers already sent"
 if (session_status() === PHP_SESSION_NONE && php_sapi_name() !== 'cli') {
     session_start();

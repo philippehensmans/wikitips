@@ -71,6 +71,9 @@ function handleRequest(string $method, array $segments, array $input): array {
         case 'upload':
             return handleUpload($method);
 
+        case 'fetch-og-image':
+            return handleFetchOgImage($method);
+
         case 'health':
             return ['status' => 'ok', 'timestamp' => date('c')];
 
@@ -219,6 +222,12 @@ function handleAnalyze(string $method, array $input): array {
             $categoryIds = array_column($cats, 'id');
         }
 
+        // Récupérer l'image og:image de la page source
+        $ogImage = null;
+        if (!empty($input['source_url'])) {
+            $ogImage = fetchOgImage($input['source_url']);
+        }
+
         $article = new Article();
         $articleId = $article->create([
             'title' => $result['title'],
@@ -229,7 +238,8 @@ function handleAnalyze(string $method, array $input): array {
             'main_points' => $result['main_points'],
             'human_rights_analysis' => $result['human_rights_analysis'],
             'categories' => $categoryIds,
-            'status' => 'draft'
+            'status' => 'draft',
+            'og_image' => $ogImage
         ]);
 
         $result['article_id'] = $articleId;
@@ -371,4 +381,40 @@ function handleUpload(string $method): array {
     $imageUrl = url('uploads/' . $filename);
 
     return ['location' => $imageUrl];
+}
+
+/**
+ * Récupérer l'image og:image d'une URL
+ */
+function handleFetchOgImage(string $method): array {
+    if ($method !== 'POST') {
+        http_response_code(405);
+        return ['error' => true, 'message' => 'Méthode non autorisée'];
+    }
+
+    // Vérifier l'authentification (session)
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (empty($_SESSION['user_id'])) {
+        http_response_code(401);
+        return ['error' => true, 'message' => 'Authentification requise'];
+    }
+
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $url = $input['url'] ?? '';
+
+    if (empty($url)) {
+        http_response_code(400);
+        return ['error' => true, 'message' => 'URL requise'];
+    }
+
+    $ogImage = fetchOgImage($url);
+
+    if ($ogImage) {
+        return ['success' => true, 'og_image' => $ogImage];
+    }
+
+    return ['success' => false, 'message' => 'Aucune image og:image trouvée sur cette page'];
 }

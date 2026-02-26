@@ -34,6 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($title)) {
         $alert = ['type' => 'error', 'message' => 'Le titre est requis.'];
     } else {
+        $ogImageField = trim($_POST['og_image'] ?? '');
+
+        // Si pas d'image og:image manuelle, tenter de la récupérer depuis la source
+        if (empty($ogImageField) && !empty($sourceUrl)) {
+            $ogImageField = fetchOgImage($sourceUrl);
+        }
+
         $articleModel = new Article();
         $articleId = $articleModel->create([
             'title' => $title,
@@ -43,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'content' => $content,
             'source_url' => $sourceUrl,
             'status' => $status,
+            'og_image' => $ogImageField ?: null,
             'categories' => array_map('intval', $categoryIds)
         ]);
 
@@ -90,7 +98,13 @@ ob_start();
         <div class="form-group">
             <label for="source_url">URL source</label>
             <input type="url" id="source_url" name="source_url" placeholder="https://..." value="<?= htmlspecialchars($_POST['source_url'] ?? '') ?>">
-            <p class="help-text">L'URL de la source originale (optionnel)</p>
+            <p class="help-text">L'URL de la source originale (optionnel). L'image de partage sera récupérée automatiquement.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="og_image">Image de partage (og:image)</label>
+            <input type="url" id="og_image" name="og_image" placeholder="https://example.com/image.jpg" value="<?= htmlspecialchars($_POST['og_image'] ?? '') ?>">
+            <p class="help-text">Optionnel. Si vide, l'image sera récupérée automatiquement depuis l'URL source.</p>
         </div>
 
         <div class="form-group">

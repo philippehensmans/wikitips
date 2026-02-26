@@ -41,6 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $categoryIds = array_column($cats, 'id');
                 }
 
+                // Récupérer l'image og:image de la page source
+                $ogImage = null;
+                if (!empty($sourceUrl)) {
+                    $ogImage = fetchOgImage($sourceUrl);
+                }
+
                 $articleModel = new Article();
                 $articleId = $articleModel->create([
                     'title' => $result['title'],
@@ -51,7 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'main_points' => $result['main_points'],
                     'human_rights_analysis' => $result['human_rights_analysis'],
                     'categories' => $categoryIds,
-                    'status' => 'draft'
+                    'status' => 'draft',
+                    'og_image' => $ogImage
                 ]);
 
                 $newArticle = $articleModel->getById($articleId);
