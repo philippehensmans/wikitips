@@ -93,6 +93,23 @@ if (!empty($article['summary'])) {
 }
 $linkedinText .= "🔗 " . $articleUrl;
 
+// URL X (Twitter)
+$twitterText = $article['title'];
+$twitterUrl = 'https://x.com/intent/post?text=' . rawurlencode($twitterText) . '&url=' . rawurlencode($articleUrl);
+
+// Message Threads (sera copié dans le presse-papiers, Threads n'a pas d'API de partage web)
+$threadsText = "📰 " . $article['title'] . "\n\n";
+if (!empty($article['summary'])) {
+    $summaryCleanThreads = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $summaryShortThreads = mb_substr($summaryCleanThreads, 0, 200);
+    if (mb_strlen($summaryCleanThreads) > 200) {
+        $summaryShortThreads .= '...';
+    }
+    $threadsText .= $summaryShortThreads . "\n\n";
+}
+$threadsText .= "🔗 " . $articleUrl;
+$threadsUrl = 'https://www.threads.net/intent/post?text=' . rawurlencode($threadsText);
+
 ob_start();
 ?>
 
@@ -112,6 +129,8 @@ ob_start();
         <a href="<?= htmlspecialchars($whatsappUrl) ?>" class="btn-whatsapp" target="_blank" title="Partager sur WhatsApp">💬 WhatsApp</a>
         <a href="#" onclick="shareOnFacebook(); return false;" class="btn-facebook" title="Partager sur Facebook">📘 Facebook</a>
         <a href="#" onclick="shareOnLinkedin(); return false;" class="btn-linkedin" title="Partager sur LinkedIn">💼 LinkedIn</a>
+        <a href="<?= htmlspecialchars($twitterUrl) ?>" class="btn-twitter" target="_blank" title="Partager sur X (Twitter)">𝕏 Twitter</a>
+        <a href="<?= htmlspecialchars($threadsUrl) ?>" class="btn-threads" target="_blank" title="Partager sur Threads">🧵 Threads</a>
         <?php if ($blueskyConfigured): ?>
         <a href="<?= url('share-bluesky.php?id=' . $article['id']) ?>" class="btn-bluesky" title="Partager sur Bluesky">🦋 Bluesky</a>
         <?php endif; ?>

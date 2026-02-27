@@ -590,6 +590,42 @@ a:hover {
     color: white;
 }
 
+.btn-twitter {
+    background: #000000;
+    border-color: #333333;
+    color: white !important;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-size: 11px;
+}
+
+.btn-twitter:hover {
+    background: #333333;
+    text-decoration: none;
+}
+
+.btn-twitter:visited {
+    color: white;
+}
+
+.btn-threads {
+    background: #000000;
+    border-color: #333333;
+    color: white !important;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-size: 11px;
+}
+
+.btn-threads:hover {
+    background: #333333;
+    text-decoration: none;
+}
+
+.btn-threads:visited {
+    color: white;
+}
+
 .btn-group {
     display: flex;
     gap: 10px;
