@@ -185,6 +185,42 @@ ob_start();
     </div>
 </div>
 
+<?php
+// Préparer le texte pour la synthèse vocale (points principaux + résumé)
+$ttsText = '';
+if (!empty($article['main_points'])) {
+    $ttsText .= "Points principaux. " . html_entity_decode(strip_tags($article['main_points']), ENT_QUOTES | ENT_HTML5, 'UTF-8') . " ";
+}
+if (!empty($article['summary'])) {
+    $ttsText .= "Résumé. " . html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+}
+$ttsText = trim(preg_replace('/\s+/', ' ', $ttsText));
+?>
+
+<?php if (!empty($ttsText)): ?>
+<div class="tts-player" id="tts-player">
+    <div class="tts-header">Écouter cet article</div>
+    <div class="tts-controls">
+        <button type="button" class="tts-btn" id="tts-play" onclick="ttsPlay()" title="Lire">&#9654; Lire</button>
+        <button type="button" class="tts-btn" id="tts-pause" onclick="ttsPause()" style="display:none" title="Pause">&#10074;&#10074; Pause</button>
+        <button type="button" class="tts-btn" id="tts-resume" onclick="ttsResume()" style="display:none" title="Reprendre">&#9654; Reprendre</button>
+        <button type="button" class="tts-btn tts-btn-stop" id="tts-stop" onclick="ttsStop()" style="display:none" title="Arrêter">&#9632; Arrêter</button>
+        <span class="tts-status" id="tts-status"></span>
+    </div>
+    <div class="tts-settings">
+        <label for="tts-speed">Vitesse :</label>
+        <select id="tts-speed" onchange="ttsUpdateRate()">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+        </select>
+        <label for="tts-voice">Voix :</label>
+        <select id="tts-voice"></select>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php if ($article['main_points']): ?>
 <div class="article-section">
     <h2>Points principaux</h2>
@@ -269,6 +305,102 @@ function shareOnLinkedin() {
         window.open(linkedinUrl, '_blank', 'width=600,height=500');
         alert('📋 Texte copié dans le presse-papiers !\n\nCollez-le (Ctrl+V) dans votre publication LinkedIn.');
     });
+}
+
+// Text-to-Speech
+const ttsText = <?= json_encode($ttsText ?? '') ?>;
+let ttsUtterance = null;
+let ttsPlaying = false;
+
+function ttsPopulateVoices() {
+    const select = document.getElementById('tts-voice');
+    if (!select) return;
+    const voices = speechSynthesis.getVoices();
+    select.innerHTML = '';
+    const frVoices = voices.filter(v => v.lang.startsWith('fr'));
+    const voiceList = frVoices.length > 0 ? frVoices : voices;
+    voiceList.forEach((voice, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = voice.name + ' (' + voice.lang + ')';
+        opt.dataset.voiceName = voice.name;
+        if (voice.default || (frVoices.length > 0 && i === 0)) opt.selected = true;
+        select.appendChild(opt);
+    });
+    select.dataset.pool = frVoices.length > 0 ? 'fr' : 'all';
+}
+
+if (typeof speechSynthesis !== 'undefined') {
+    speechSynthesis.onvoiceschanged = ttsPopulateVoices;
+    ttsPopulateVoices();
+} else {
+    const player = document.getElementById('tts-player');
+    if (player) player.style.display = 'none';
+}
+
+function ttsGetSelectedVoice() {
+    const select = document.getElementById('tts-voice');
+    if (!select || !select.value) return null;
+    const voices = speechSynthesis.getVoices();
+    const frVoices = voices.filter(v => v.lang.startsWith('fr'));
+    const pool = select.dataset.pool === 'fr' ? frVoices : voices;
+    return pool[parseInt(select.value)] || null;
+}
+
+function ttsPlay() {
+    if (!ttsText) return;
+    speechSynthesis.cancel();
+    ttsUtterance = new SpeechSynthesisUtterance(ttsText);
+    ttsUtterance.rate = parseFloat(document.getElementById('tts-speed').value);
+    const voice = ttsGetSelectedVoice();
+    if (voice) ttsUtterance.voice = voice;
+    ttsUtterance.lang = 'fr-FR';
+
+    ttsUtterance.onend = function() { ttsResetUI(); };
+    ttsUtterance.onerror = function() { ttsResetUI(); };
+
+    speechSynthesis.speak(ttsUtterance);
+    ttsPlaying = true;
+    document.getElementById('tts-play').style.display = 'none';
+    document.getElementById('tts-resume').style.display = 'none';
+    document.getElementById('tts-pause').style.display = '';
+    document.getElementById('tts-stop').style.display = '';
+    document.getElementById('tts-status').textContent = 'Lecture en cours...';
+}
+
+function ttsPause() {
+    speechSynthesis.pause();
+    document.getElementById('tts-pause').style.display = 'none';
+    document.getElementById('tts-resume').style.display = '';
+    document.getElementById('tts-status').textContent = 'En pause';
+}
+
+function ttsResume() {
+    speechSynthesis.resume();
+    document.getElementById('tts-resume').style.display = 'none';
+    document.getElementById('tts-pause').style.display = '';
+    document.getElementById('tts-status').textContent = 'Lecture en cours...';
+}
+
+function ttsStop() {
+    speechSynthesis.cancel();
+    ttsResetUI();
+}
+
+function ttsResetUI() {
+    ttsPlaying = false;
+    document.getElementById('tts-play').style.display = '';
+    document.getElementById('tts-pause').style.display = 'none';
+    document.getElementById('tts-resume').style.display = 'none';
+    document.getElementById('tts-stop').style.display = 'none';
+    document.getElementById('tts-status').textContent = '';
+}
+
+function ttsUpdateRate() {
+    if (ttsPlaying) {
+        // Relancer avec la nouvelle vitesse
+        ttsPlay();
+    }
 }
 
 function confirmDelete(id) {
