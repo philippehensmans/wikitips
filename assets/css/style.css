@@ -626,6 +626,71 @@ a:hover {
     color: white;
 }
 
+/* Text-to-Speech player */
+.tts-player {
+    background: var(--wiki-bg);
+    border: 1px solid var(--wiki-border);
+    margin: 15px 0;
+    padding: 12px 15px;
+}
+
+.tts-header {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #36c;
+    border-bottom: 1px solid var(--wiki-border);
+    padding-bottom: 6px;
+}
+
+.tts-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.tts-btn {
+    background: #f8f9fa;
+    border: 1px solid #a2a9b1;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 2px;
+}
+
+.tts-btn:hover {
+    background: #eaecf0;
+}
+
+.tts-btn-stop {
+    color: #d33;
+}
+
+.tts-status {
+    font-size: 12px;
+    color: #54595d;
+    font-style: italic;
+}
+
+.tts-settings {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.tts-settings label {
+    color: #54595d;
+}
+
+.tts-settings select {
+    padding: 2px 4px;
+    font-size: 12px;
+    border: 1px solid #a2a9b1;
+    border-radius: 2px;
+}
+
 .btn-group {
     display: flex;
     gap: 10px;
