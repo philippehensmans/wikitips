@@ -34,7 +34,10 @@ if (!$article) {
 
 // Enregistrer la vue
 $articleModel->recordView($article['id']);
-$viewCount = $articleModel->getViewCount($article['id']);
+
+$auth = new Auth();
+$isAdmin = $auth->isAdmin();
+$viewCount = $isAdmin ? $articleModel->getViewCount($article['id']) : 0;
 
 $pageTitle = htmlspecialchars($article['title']) . ' - ' . SITE_NAME;
 
@@ -146,7 +149,9 @@ ob_start();
         <?php if (!empty($article['country'])): ?>
             &bull; <a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a>
         <?php endif; ?>
+        <?php if ($isAdmin): ?>
         &bull; <?= $viewCount ?> vue<?= $viewCount > 1 ? 's' : '' ?>
+        <?php endif; ?>
         &bull; Créé le <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
         <?php if ($article['updated_at'] !== $article['created_at']): ?>
             &bull; Modifié le <?= date('d/m/Y à H:i', strtotime($article['updated_at'])) ?>
@@ -171,10 +176,12 @@ ob_start();
             <div class="infobox-label">Date</div>
             <div class="infobox-value"><?= date('d/m/Y', strtotime($article['created_at'])) ?></div>
         </div>
+        <?php if ($isAdmin): ?>
         <div class="infobox-row">
             <div class="infobox-label">Vues</div>
             <div class="infobox-value"><?= $viewCount ?></div>
         </div>
+        <?php endif; ?>
         <?php if (!empty($article['country'])): ?>
         <div class="infobox-row">
             <div class="infobox-label">Pays</div>
