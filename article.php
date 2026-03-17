@@ -32,12 +32,12 @@ if (!$article) {
     exit;
 }
 
-// Enregistrer la vue
+// Enregistrer la vue (compteur anonyme, aucune donnée personnelle)
 $articleModel->recordView($article['id']);
 
 $auth = new Auth();
 $isAdmin = $auth->isAdmin();
-$viewCount = $isAdmin ? $articleModel->getViewCount($article['id']) : 0;
+$viewCount = (int)($article['view_count'] ?? 0) + 1;
 
 $pageTitle = htmlspecialchars($article['title']) . ' - ' . SITE_NAME;
 
