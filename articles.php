@@ -10,6 +10,10 @@ $pageTitle = 'Articles' . ($status === 'draft' ? ' - Brouillons' : '') . ' - ' .
 $articleModel = new Article();
 $articles = $articleModel->getAll($status);
 
+// Récupérer les compteurs de vues pour tous les articles
+$articleIds = array_column($articles, 'id');
+$viewCounts = $articleModel->getViewCounts($articleIds);
+
 ob_start();
 ?>
 
@@ -44,6 +48,7 @@ ob_start();
                 <?php endif; ?>
                 <div class="meta">
                     <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
+                    | <?= $viewCounts[$article['id']] ?? 0 ?> vue<?= ($viewCounts[$article['id']] ?? 0) > 1 ? 's' : '' ?>
                     <?php if (!empty($article['country'])): ?>
                         | <a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a>
                     <?php endif; ?>

@@ -32,6 +32,10 @@ if (!$article) {
     exit;
 }
 
+// Enregistrer la vue
+$articleModel->recordView($article['id']);
+$viewCount = $articleModel->getViewCount($article['id']);
+
 $pageTitle = htmlspecialchars($article['title']) . ' - ' . SITE_NAME;
 
 // Construire l'URL de l'article pour le partage et Open Graph
@@ -142,6 +146,7 @@ ob_start();
         <?php if (!empty($article['country'])): ?>
             &bull; <a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a>
         <?php endif; ?>
+        &bull; <?= $viewCount ?> vue<?= $viewCount > 1 ? 's' : '' ?>
         &bull; Créé le <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
         <?php if ($article['updated_at'] !== $article['created_at']): ?>
             &bull; Modifié le <?= date('d/m/Y à H:i', strtotime($article['updated_at'])) ?>
@@ -165,6 +170,10 @@ ob_start();
         <div class="infobox-row">
             <div class="infobox-label">Date</div>
             <div class="infobox-value"><?= date('d/m/Y', strtotime($article['created_at'])) ?></div>
+        </div>
+        <div class="infobox-row">
+            <div class="infobox-label">Vues</div>
+            <div class="infobox-value"><?= $viewCount ?></div>
         </div>
         <?php if (!empty($article['country'])): ?>
         <div class="infobox-row">

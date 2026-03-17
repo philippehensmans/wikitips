@@ -190,6 +190,96 @@ class Article {
     }
 
     /**
+     * Enregistrer une vue pour un article (max 1 par IP par heure)
+     */
+    public function recordView(int $articleId): void {
+        $ipHash = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+        // Vérifier si cette IP a déjà visité cet article dans la dernière heure
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) FROM article_views
+            WHERE article_id = :article_id AND ip_hash = :ip_hash
+            AND viewed_at > datetime('now', '-1 hour')
+        ");
+        $stmt->execute(['article_id' => $articleId, 'ip_hash' => $ipHash]);
+
+        if ((int)$stmt->fetchColumn() === 0) {
+            $stmt = $this->db->prepare("
+                INSERT INTO article_views (article_id, ip_hash, user_agent)
+                VALUES (:article_id, :ip_hash, :user_agent)
+            ");
+            $stmt->execute([
+                'article_id' => $articleId,
+                'ip_hash' => $ipHash,
+                'user_agent' => $userAgent
+            ]);
+        }
+    }
+
+    /**
+     * Récupérer le nombre de vues d'un article
+     */
+    public function getViewCount(int $articleId): int {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM article_views WHERE article_id = :article_id");
+        $stmt->execute(['article_id' => $articleId]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    /**
+     * Récupérer le nombre de vues pour plusieurs articles (optimisé)
+     */
+    public function getViewCounts(array $articleIds): array {
+        if (empty($articleIds)) return [];
+
+        $placeholders = implode(',', array_fill(0, count($articleIds), '?'));
+        $stmt = $this->db->prepare("
+            SELECT article_id, COUNT(*) as view_count
+            FROM article_views
+            WHERE article_id IN ($placeholders)
+            GROUP BY article_id
+        ");
+        $stmt->execute($articleIds);
+
+        $counts = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $counts[$row['article_id']] = (int)$row['view_count'];
+        }
+        return $counts;
+    }
+
+    /**
+     * Récupérer les articles les plus vus
+     */
+    public function getMostViewed(int $limit = 10, ?string $period = null): array {
+        $periodClause = '';
+        if ($period === 'week') {
+            $periodClause = "AND av.viewed_at > datetime('now', '-7 days')";
+        } elseif ($period === 'month') {
+            $periodClause = "AND av.viewed_at > datetime('now', '-30 days')";
+        }
+
+        $stmt = $this->db->prepare("
+            SELECT a.*, COUNT(av.id) as view_count
+            FROM articles a
+            JOIN article_views av ON a.id = av.article_id
+            WHERE a.status = 'published' $periodClause
+            GROUP BY a.id
+            ORDER BY view_count DESC
+            LIMIT :limit
+        ");
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $articles = $stmt->fetchAll();
+
+        foreach ($articles as &$article) {
+            $article['categories'] = $this->getCategories($article['id']);
+        }
+
+        return $articles;
+    }
+
+    /**
      * Rechercher des articles
      */
     public function search(string $query): array {
