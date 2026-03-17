@@ -20,10 +20,17 @@
    - [Configuration Bluesky](#configuration-bluesky)
    - [Partage manuel](#partage-manuel)
    - [Partage automatique](#partage-automatique)
-8. [API REST](#api-rest)
-9. [Sécurité](#sécurité)
-10. [Personnalisation](#personnalisation)
-11. [Dépannage](#dépannage)
+8. [Newsletter](#newsletter)
+   - [Configuration Mailchimp](#configuration-mailchimp)
+   - [Inscription des abonnés](#inscription-des-abonnés)
+   - [Envoi automatique (Cron)](#envoi-automatique-cron)
+   - [Envoi via HTTP (cron-job.org)](#envoi-via-http-cron-joborg)
+   - [Logs et suivi](#logs-et-suivi)
+   - [Dépannage newsletter](#dépannage-newsletter)
+9. [API REST](#api-rest)
+10. [Sécurité](#sécurité)
+11. [Personnalisation](#personnalisation)
+12. [Dépannage](#dépannage)
 
 ---
 
@@ -91,6 +98,18 @@
 | Personnalisation | Texte du post modifiable avant envoi |
 | Carte de lien | Aperçu riche avec titre et description |
 
+### Newsletter
+
+| Fonctionnalité | Description |
+|----------------|-------------|
+| Inscription / désinscription | Formulaire public avec double opt-in via Mailchimp |
+| Newsletter hebdomadaire | Récapitulatif automatique des articles de la semaine |
+| Envoi cron CLI | Script `cron/send-newsletter.php` pour crontab serveur |
+| Envoi cron HTTP | Endpoint `cron.php` pour services comme cron-job.org |
+| Mode dry-run | Prévisualisation HTML sans envoi réel |
+| Protection anti-doublons | Empêche l'envoi multiple dans la même semaine |
+| Logs d'envoi | Historique de tous les envois en base de données |
+
 ---
 
 ## Architecture technique
@@ -132,6 +151,11 @@ news/
 ├── profile.php                # Profil utilisateur
 ├── users.php                  # Gestion des utilisateurs (admin)
 ├── share-bluesky.php          # Partage sur Bluesky
+├── newsletter.php             # Page d'inscription/désinscription newsletter
+├── cron.php                   # Point d'entrée HTTP pour tâches cron
+│
+├── cron/
+│   └── send-newsletter.php    # Script CLI d'envoi de newsletter
 │
 ├── includes/
 │   ├── Database.php           # Classe de gestion SQLite
@@ -140,7 +164,8 @@ news/
 │   ├── Auth.php               # Gestion authentification
 │   ├── Page.php               # Gestion pages statiques
 │   ├── ClaudeService.php      # Intégration API Claude
-│   └── BlueskyService.php     # Intégration Bluesky (AT Protocol)
+│   ├── BlueskyService.php     # Intégration Bluesky (AT Protocol)
+│   └── MailchimpService.php   # Intégration Mailchimp (newsletter)
 │
 ├── api/
 │   └── index.php              # Routeur API REST
@@ -215,6 +240,16 @@ news/
 | title | TEXT | Titre de la page |
 | content | TEXT | Contenu HTML/Markdown |
 | updated_at | DATETIME | Dernière modification |
+
+#### Table `newsletter_logs`
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| id | INTEGER | Clé primaire auto-incrémentée |
+| campaign_id | TEXT | Identifiant de la campagne Mailchimp |
+| article_count | INTEGER | Nombre d'articles inclus dans l'envoi |
+| sent_at | DATETIME | Date et heure de l'envoi |
+| status | TEXT | Statut : `sent`, `skipped` ou `error` |
 
 ---
 
@@ -348,7 +383,14 @@ Ce fichier contient vos paramètres spécifiques :
 | `CLAUDE_API_KEY` | Clé API Anthropic | `sk-ant-api03-xxx` |
 | `API_SECRET_KEY` | Clé secrète API REST | `ma-cle-secrete-123` |
 | `BASE_PATH` | Chemin si sous-répertoire | `/news` |
+| `SITE_URL` | URL publique du site | `https://monsite.com` |
 | `DB_PATH` | Chemin base de données | `/var/data/wiki.db` |
+| `MAILCHIMP_API_KEY` | Clé API Mailchimp | `abc123-us21` |
+| `MAILCHIMP_LIST_ID` | ID de l'audience Mailchimp | `a1b2c3d4e5` |
+| `MAILCHIMP_FROM_NAME` | Nom d'expéditeur (défaut : SITE_NAME) | `News` |
+| `MAILCHIMP_NEWSLETTER_TAG` | Tag pour cibler les abonnés (défaut : `newsletter-hebdo`) | `newsletter-hebdo` |
+| `NEWSLETTER_DAY` | Jour d'envoi (défaut : `monday`) | `monday` |
+| `CRON_SECRET_TOKEN` | Token pour les appels cron HTTP | `a1b2c3...` |
 
 ### Obtenir une clé API Anthropic
 
@@ -645,6 +687,290 @@ define('BLUESKY_AUTO_SHARE', true);
 
 ---
 
+## Newsletter
+
+News intègre un système de newsletter hebdomadaire via **Mailchimp**. Chaque semaine, un récapitulatif des articles publiés est envoyé automatiquement aux abonnés inscrits.
+
+### Fonctionnement général
+
+```
+1. Les visiteurs s'inscrivent via le formulaire (newsletter.php)
+2. Ils reçoivent un email de confirmation (double opt-in)
+3. Le tag "newsletter-hebdo" leur est attribué dans Mailchimp
+4. Chaque semaine, le cron récupère les articles récents
+5. Une campagne Mailchimp est créée et envoyée aux abonnés tagués
+6. L'envoi est enregistré dans la table newsletter_logs
+```
+
+### Configuration Mailchimp
+
+#### Étape 1 : Créer un compte Mailchimp
+
+1. Inscrivez-vous sur [mailchimp.com](https://mailchimp.com)
+2. Créez une **audience** (liste de contacts)
+
+#### Étape 2 : Obtenir la clé API
+
+1. Connectez-vous à Mailchimp
+2. Allez dans **Account > Extras > API keys**
+3. Cliquez sur **Create A Key**
+4. Copiez la clé (format : `xxxxxxxxxxxxxxxx-us21`)
+
+> **Note** : Le suffixe après le tiret (ex: `us21`) est votre datacenter. Il est extrait automatiquement par l'application.
+
+#### Étape 3 : Obtenir l'ID de l'audience
+
+1. Allez dans **Audience > Settings > Audience name and defaults**
+2. L'**Audience ID** est affiché en bas de la page
+
+#### Étape 4 : Configurer News
+
+Ajoutez dans votre fichier `config.local.php` :
+
+```php
+<?php
+// Configuration Mailchimp (obligatoire pour la newsletter)
+define('MAILCHIMP_API_KEY', 'votre-api-key-us21');
+define('MAILCHIMP_LIST_ID', 'votre-audience-id');
+
+// URL publique du site (obligatoire pour les liens dans la newsletter)
+define('SITE_URL', 'https://votre-domaine.com');
+
+// Token secret pour les appels cron HTTP (obligatoire si cron-job.org)
+// Générez-le avec : php -r "echo bin2hex(random_bytes(32));"
+define('CRON_SECRET_TOKEN', 'votre-token-secret');
+```
+
+#### Options avancées
+
+```php
+// Nom d'expéditeur (défaut : SITE_NAME)
+define('MAILCHIMP_FROM_NAME', 'Mon Site News');
+
+// Tag pour cibler les abonnés newsletter (défaut : 'newsletter-hebdo')
+define('MAILCHIMP_NEWSLETTER_TAG', 'newsletter-hebdo');
+
+// Jour d'envoi prévu (défaut : 'monday')
+define('NEWSLETTER_DAY', 'monday');
+```
+
+| Paramètre | Description | Défaut |
+|-----------|-------------|--------|
+| `MAILCHIMP_API_KEY` | Clé API Mailchimp | *(vide — obligatoire)* |
+| `MAILCHIMP_LIST_ID` | ID de l'audience | *(vide — obligatoire)* |
+| `MAILCHIMP_FROM_NAME` | Nom d'expéditeur | Valeur de `SITE_NAME` |
+| `MAILCHIMP_NEWSLETTER_TAG` | Tag pour cibler les abonnés | `newsletter-hebdo` |
+| `NEWSLETTER_DAY` | Jour d'envoi | `monday` |
+| `CRON_SECRET_TOKEN` | Token pour l'endpoint HTTP | *(vide — obligatoire si cron HTTP)* |
+
+### Inscription des abonnés
+
+La page `newsletter.php` fournit un formulaire public d'inscription et de désinscription.
+
+#### Inscription
+
+1. Le visiteur accède à la page newsletter
+2. Il remplit le formulaire : email, prénom (optionnel), nom (optionnel)
+3. Il clique sur **S'inscrire**
+4. Un **email de confirmation** est envoyé (double opt-in)
+5. Après confirmation, le tag `newsletter-hebdo` est ajouté au contact dans Mailchimp
+6. L'abonné recevra les prochaines newsletters
+
+#### Désinscription
+
+1. Le visiteur accède à la page newsletter
+2. Il entre son email dans le formulaire de désinscription
+3. Le tag `newsletter-hebdo` est retiré (le contact reste dans l'audience Mailchimp)
+4. Il ne recevra plus la newsletter
+
+> **Note** : Seuls les contacts ayant le tag `newsletter-hebdo` reçoivent la newsletter. Il faut au moins un abonné avec ce tag pour que l'envoi fonctionne.
+
+### Envoi automatique (Cron)
+
+Le script `cron/send-newsletter.php` permet d'envoyer la newsletter via un cron serveur (CLI).
+
+#### Configuration du crontab
+
+```bash
+# Envoyer la newsletter chaque lundi à 9h
+0 9 * * 1 php /chemin/vers/news/cron/send-newsletter.php
+
+# Exemple avec chemin complet vers PHP
+0 9 * * 1 /usr/bin/php /var/www/html/news/cron/send-newsletter.php
+```
+
+#### Options en ligne de commande
+
+| Option | Description | Exemple |
+|--------|-------------|---------|
+| `--dry-run` | Aperçu sans envoi (génère un fichier HTML de prévisualisation) | `php send-newsletter.php --dry-run` |
+| `--days=N` | Couvrir les N derniers jours au lieu de 7 | `php send-newsletter.php --days=14` |
+| `--force` | Envoyer même si une newsletter a déjà été envoyée cette semaine | `php send-newsletter.php --force` |
+
+#### Exemples d'utilisation
+
+```bash
+# Test en dry-run (recommandé avant le premier envoi réel)
+php /var/www/html/news/cron/send-newsletter.php --dry-run
+
+# Envoi normal (articles des 7 derniers jours)
+php /var/www/html/news/cron/send-newsletter.php
+
+# Envoi couvrant les 14 derniers jours
+php /var/www/html/news/cron/send-newsletter.php --days=14
+
+# Forcer un renvoi même si déjà envoyée cette semaine
+php /var/www/html/news/cron/send-newsletter.php --force
+```
+
+#### Comportement du script
+
+1. Vérifie que Mailchimp est configuré
+2. Vérifie qu'aucune newsletter n'a été envoyée dans les 7 derniers jours (sauf `--force`)
+3. Récupère les articles publiés dans la période
+4. S'il n'y a aucun article, enregistre un log `skipped` et s'arrête
+5. Construit le HTML de la newsletter avec les articles et leurs catégories
+6. En mode `--dry-run` : sauvegarde l'aperçu HTML dans `data/newsletter-preview.html`
+7. En mode normal : crée une campagne Mailchimp, y place le contenu, et l'envoie
+8. Enregistre le résultat dans `newsletter_logs` (statut `sent` ou `error`)
+
+### Envoi via HTTP (cron-job.org)
+
+Le fichier `cron.php` à la racine est un point d'entrée HTTP permettant de déclencher l'envoi depuis un service externe comme [cron-job.org](https://cron-job.org).
+
+#### URL d'appel
+
+```
+https://votre-site.com/news/cron.php?action=newsletter&token=VOTRE_TOKEN
+```
+
+#### Paramètres
+
+| Paramètre | Requis | Description |
+|-----------|--------|-------------|
+| `action` | Oui | Action à exécuter (`newsletter`) |
+| `token` | Oui | Token secret (`CRON_SECRET_TOKEN`) |
+| `days` | Non | Nombre de jours à couvrir (défaut : 7) |
+| `force` | Non | Présence du paramètre = forcer l'envoi |
+
+#### Exemples d'URL
+
+```
+# Envoi standard
+https://votre-site.com/news/cron.php?action=newsletter&token=abc123
+
+# Envoi couvrant 14 jours
+https://votre-site.com/news/cron.php?action=newsletter&token=abc123&days=14
+
+# Forcer l'envoi
+https://votre-site.com/news/cron.php?action=newsletter&token=abc123&force
+```
+
+#### Sécurité
+
+- Le token est vérifié avec `hash_equals()` (comparaison résistante aux attaques par timing)
+- Si `CRON_SECRET_TOKEN` n'est pas défini, l'endpoint renvoie une erreur 500
+- Si le token est invalide, l'endpoint renvoie une erreur 403
+
+#### Configuration sur cron-job.org
+
+1. Créez un compte sur [cron-job.org](https://cron-job.org)
+2. Ajoutez un nouveau cron job avec l'URL ci-dessus
+3. Programmez-le chaque lundi à 9h00 (ou selon votre préférence)
+4. Activez les notifications par email pour surveiller le bon fonctionnement
+
+### Logs et suivi
+
+Chaque tentative d'envoi est enregistrée dans la table `newsletter_logs` :
+
+| Statut | Signification |
+|--------|---------------|
+| `sent` | Newsletter envoyée avec succès |
+| `skipped` | Aucun article trouvé pour la période |
+| `error` | Erreur lors de l'envoi (voir les logs serveur) |
+
+Le système empêche l'envoi de doublons : si une newsletter avec le statut `sent` existe dans les 7 derniers jours, l'envoi est bloqué (sauf avec `--force` ou `&force`).
+
+### Contenu de la newsletter
+
+La newsletter générée contient :
+
+- Le **nom du site** en en-tête
+- La **période couverte** (ex: 10/03 - 17/03/2026)
+- La **liste des articles** publiés, chacun avec :
+  - Son titre (lien cliquable vers l'article)
+  - Sa catégorie
+  - Son résumé (si disponible)
+  - Sa date de publication
+- Un **pied de page** avec un lien de désinscription
+
+### Dépannage newsletter
+
+#### "Mailchimp n'est pas configuré"
+
+**Cause** : `MAILCHIMP_API_KEY` ou `MAILCHIMP_LIST_ID` est vide.
+
+**Solution** : Ajoutez les valeurs dans `config.local.php` :
+```php
+define('MAILCHIMP_API_KEY', 'votre-api-key-us21');
+define('MAILCHIMP_LIST_ID', 'votre-audience-id');
+```
+
+#### "SITE_URL pointe vers localhost"
+
+**Cause** : En mode CLI, `SITE_URL` n'est pas défini et tombe sur `http://localhost:8080`. Le service Mailchimp bloque l'envoi pour éviter des liens cassés.
+
+**Solution** : Définissez `SITE_URL` dans `config.local.php` :
+```php
+define('SITE_URL', 'https://votre-domaine.com');
+```
+
+Ou via variable d'environnement :
+```bash
+export SITE_URL=https://votre-domaine.com
+```
+
+#### "Une newsletter a déjà été envoyée cette semaine"
+
+**Cause** : Une newsletter avec le statut `sent` existe dans les 7 derniers jours.
+
+**Solution** : Utilisez `--force` (CLI) ou `&force` (HTTP) pour envoyer quand même.
+
+#### "Le tag newsletter-hebdo n'existe pas"
+
+**Cause** : Aucun abonné n'a encore le tag `newsletter-hebdo`. Le tag est créé automatiquement lors de la première inscription via le formulaire.
+
+**Solution** : Inscrivez au moins un abonné via la page `newsletter.php` avant de lancer l'envoi.
+
+#### "CRON_SECRET_TOKEN non configuré"
+
+**Cause** : Le token n'est pas défini dans `config.local.php` (concerne uniquement l'appel HTTP via `cron.php`).
+
+**Solution** :
+```php
+// Générez un token aléatoire
+// php -r "echo bin2hex(random_bytes(32));"
+define('CRON_SECRET_TOKEN', 'votre-token-genere');
+```
+
+#### "Token invalide" (erreur 403)
+
+**Cause** : Le token passé dans l'URL ne correspond pas à `CRON_SECRET_TOKEN`.
+
+**Solution** : Vérifiez que le paramètre `token` dans l'URL correspond exactement à la valeur définie dans `config.local.php`.
+
+#### La newsletter est envoyée mais les liens sont cassés
+
+**Cause** : `SITE_URL` et/ou `BASE_PATH` sont mal configurés.
+
+**Solution** :
+```php
+define('SITE_URL', 'https://votre-domaine.com');
+define('BASE_PATH', '/news');  // Si installé dans un sous-répertoire
+```
+
+---
+
 ## API REST
 
 ### Authentification
@@ -901,4 +1227,4 @@ News est distribué sous licence MIT.
 
 ---
 
-*Documentation mise à jour le 15 janvier 2026*
+*Documentation mise à jour le 17 mars 2026*
