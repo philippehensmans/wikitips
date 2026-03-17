@@ -121,7 +121,7 @@ class Article {
     /**
      * Récupérer tous les articles
      */
-    public function getAll(string $status = null, int $limit = 50, int $offset = 0): array {
+    public function getAll(?string $status = null, int $limit = 50, int $offset = 0): array {
         $sql = "SELECT * FROM articles";
         $params = [];
 
@@ -153,7 +153,7 @@ class Article {
     /**
      * Récupérer tous les articles d'un pays
      */
-    public function getByCountry(string $country, string $status = null): array {
+    public function getByCountry(string $country, ?string $status = null): array {
         $sql = "SELECT * FROM articles WHERE country = :country";
         $params = ['country' => $country];
 
