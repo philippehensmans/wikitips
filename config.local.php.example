@@ -24,6 +24,12 @@ define('SITE_URL', 'https://votre-domaine.com');
 // Générez un token aléatoire, ex: bin2hex(random_bytes(32))
 define('CRON_SECRET_TOKEN', 'votre-token-cron-secret');
 
+// Configuration Mailchimp (nécessaire pour la newsletter)
+// API key : Account > Extras > API keys sur mailchimp.com
+// List ID : Audience > Settings > Audience name and defaults
+define('MAILCHIMP_API_KEY', 'votre-api-key-us21');
+define('MAILCHIMP_LIST_ID', 'votre-audience-id');
+
 // Nom et description du site (optionnel)
 // define('SITE_NAME', 'News - Mon Site');
 // define('SITE_DESCRIPTION', 'Ma description personnalisée');

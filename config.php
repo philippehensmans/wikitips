@@ -41,10 +41,13 @@ if (!defined('SITE_URL')) {
     $siteUrlEnv = getenv('SITE_URL');
     if ($siteUrlEnv) {
         define('SITE_URL', rtrim($siteUrlEnv, '/'));
-    } elseif (!empty($_SERVER['HTTP_HOST'])) {
+    } elseif (php_sapi_name() !== 'cli' && !empty($_SERVER['HTTP_HOST'])) {
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         define('SITE_URL', $scheme . '://' . $_SERVER['HTTP_HOST']);
     } else {
+        // En CLI sans SITE_URL défini, utiliser localhost par défaut
+        // IMPORTANT: Définissez SITE_URL dans config.local.php ou en variable
+        // d'environnement pour que le cron newsletter fonctionne
         define('SITE_URL', 'http://localhost:8080');
     }
 }
@@ -98,14 +101,16 @@ if (!defined('OLD_BASE_PATH')) {
     define('OLD_BASE_PATH', '/wikitips');
 }
 
-// Redirection automatique de l'ancien chemin vers le nouveau
-$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-if (defined('OLD_BASE_PATH') && OLD_BASE_PATH !== '' && preg_match('#^' . preg_quote(OLD_BASE_PATH, '#') . '(/.*)?$#i', $requestUri, $matches)) {
-    $newBasePath = defined('BASE_PATH') ? BASE_PATH : '/news';
-    $newPath = $newBasePath . ($matches[1] ?? '/');
-    header('HTTP/1.1 301 Moved Permanently');
-    header('Location: ' . $newPath);
-    exit;
+// Redirection automatique de l'ancien chemin vers le nouveau (HTTP uniquement)
+if (php_sapi_name() !== 'cli') {
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    if (defined('OLD_BASE_PATH') && OLD_BASE_PATH !== '' && preg_match('#^' . preg_quote(OLD_BASE_PATH, '#') . '(/.*)?$#i', $requestUri, $matches)) {
+        $newBasePath = defined('BASE_PATH') ? BASE_PATH : '/news';
+        $newPath = $newBasePath . ($matches[1] ?? '/');
+        header('HTTP/1.1 301 Moved Permanently');
+        header('Location: ' . $newPath);
+        exit;
+    }
 }
 
 // Chemin de base (auto-détecté ou défini manuellement)
@@ -114,8 +119,11 @@ if (!defined('BASE_PATH')) {
     $basePathEnv = getenv('BASE_PATH');
     if ($basePathEnv !== false) {
         define('BASE_PATH', rtrim($basePathEnv, '/'));
+    } elseif (php_sapi_name() === 'cli') {
+        // En CLI, pas d'auto-détection possible — utiliser un défaut vide
+        define('BASE_PATH', '');
     } else {
-        // Auto-détection du chemin de base
+        // Auto-détection du chemin de base en HTTP
         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
         $basePath = rtrim(dirname($scriptName), '/');
         // Éviter les doubles slashes pour la racine
