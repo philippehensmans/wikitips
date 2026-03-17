@@ -17,12 +17,6 @@ $auth = new Auth();
 $isLoggedIn = $auth->isLoggedIn();
 $isAdmin = $auth->isAdmin();
 
-// Récupérer les compteurs de vues (admin uniquement)
-$viewCounts = [];
-if ($isAdmin) {
-    $articleIds = array_column($recentArticles, 'id');
-    $viewCounts = $articleModel->getViewCounts($articleIds);
-}
 $draftCount = $isLoggedIn ? count($articleModel->getAll('draft')) : 0;
 
 ob_start();
@@ -72,7 +66,8 @@ ob_start();
                     <div class="meta">
                         Publié le <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
                         <?php if ($isAdmin): ?>
-                        | <?= $viewCounts[$article['id']] ?? 0 ?> vue<?= ($viewCounts[$article['id']] ?? 0) > 1 ? 's' : '' ?>
+                        <?php $vc = (int)($article['view_count'] ?? 0); ?>
+                        | <?= $vc ?> vue<?= $vc > 1 ? 's' : '' ?>
                         <?php endif; ?>
                         <?php if (!empty($article['country'])): ?>
                             | <a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a>

@@ -151,21 +151,19 @@ class Database {
             )
         ");
 
-        // Table de suivi des vues par article
-        $this->pdo->exec("
-            CREATE TABLE IF NOT EXISTS article_views (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                article_id INTEGER NOT NULL,
-                ip_hash TEXT,
-                user_agent TEXT,
-                viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
-            )
-        ");
+        // Migration: Ajouter la colonne view_count pour le compteur de vues anonyme
+        $this->addColumnIfNotExists('articles', 'view_count', 'INTEGER DEFAULT 0');
 
-        // Index pour optimiser les requêtes de comptage
-        $this->pdo->exec("CREATE INDEX IF NOT EXISTS idx_article_views_article_id ON article_views(article_id)");
-        $this->pdo->exec("CREATE INDEX IF NOT EXISTS idx_article_views_viewed_at ON article_views(viewed_at)");
+        // Migration: Migrer les données de article_views vers view_count puis supprimer la table
+        $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='article_views'");
+        if ($stmt->fetch()) {
+            $this->pdo->exec("
+                UPDATE articles SET view_count = (
+                    SELECT COUNT(*) FROM article_views WHERE article_views.article_id = articles.id
+                ) WHERE EXISTS (SELECT 1 FROM article_views WHERE article_views.article_id = articles.id)
+            ");
+            $this->pdo->exec("DROP TABLE article_views");
+        }
 
         // Créer la page d'accueil par défaut si elle n'existe pas
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM pages WHERE slug = 'home'");

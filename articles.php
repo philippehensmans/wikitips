@@ -10,14 +10,8 @@ $pageTitle = 'Articles' . ($status === 'draft' ? ' - Brouillons' : '') . ' - ' .
 $articleModel = new Article();
 $articles = $articleModel->getAll($status);
 
-// Récupérer les compteurs de vues (admin uniquement)
 $auth = new Auth();
 $isAdmin = $auth->isAdmin();
-$viewCounts = [];
-if ($isAdmin) {
-    $articleIds = array_column($articles, 'id');
-    $viewCounts = $articleModel->getViewCounts($articleIds);
-}
 
 ob_start();
 ?>
@@ -54,7 +48,8 @@ ob_start();
                 <div class="meta">
                     <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
                     <?php if ($isAdmin): ?>
-                    | <?= $viewCounts[$article['id']] ?? 0 ?> vue<?= ($viewCounts[$article['id']] ?? 0) > 1 ? 's' : '' ?>
+                    <?php $vc = (int)($article['view_count'] ?? 0); ?>
+                    | <?= $vc ?> vue<?= $vc > 1 ? 's' : '' ?>
                     <?php endif; ?>
                     <?php if (!empty($article['country'])): ?>
                         | <a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a>
