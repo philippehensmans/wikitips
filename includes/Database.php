@@ -151,6 +151,22 @@ class Database {
             )
         ");
 
+        // Table de suivi des vues par article
+        $this->pdo->exec("
+            CREATE TABLE IF NOT EXISTS article_views (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                article_id INTEGER NOT NULL,
+                ip_hash TEXT,
+                user_agent TEXT,
+                viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
+            )
+        ");
+
+        // Index pour optimiser les requêtes de comptage
+        $this->pdo->exec("CREATE INDEX IF NOT EXISTS idx_article_views_article_id ON article_views(article_id)");
+        $this->pdo->exec("CREATE INDEX IF NOT EXISTS idx_article_views_viewed_at ON article_views(viewed_at)");
+
         // Créer la page d'accueil par défaut si elle n'existe pas
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM pages WHERE slug = 'home'");
         if ((int)$stmt->fetchColumn() === 0) {

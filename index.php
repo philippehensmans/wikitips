@@ -13,6 +13,10 @@ $homePage = $pageModel->getBySlug('home');
 $articleModel = new Article();
 $recentArticles = $articleModel->getAll('published', 10);
 
+// Récupérer les compteurs de vues
+$articleIds = array_column($recentArticles, 'id');
+$viewCounts = $articleModel->getViewCounts($articleIds);
+
 $auth = new Auth();
 $isLoggedIn = $auth->isLoggedIn();
 $draftCount = $isLoggedIn ? count($articleModel->getAll('draft')) : 0;
@@ -63,6 +67,7 @@ ob_start();
                     <?php endif; ?>
                     <div class="meta">
                         Publié le <?= date('d/m/Y à H:i', strtotime($article['created_at'])) ?>
+                        | <?= $viewCounts[$article['id']] ?? 0 ?> vue<?= ($viewCounts[$article['id']] ?? 0) > 1 ? 's' : '' ?>
                         <?php if (!empty($article['country'])): ?>
                             | <a href="<?= url('country.php?name=' . urlencode($article['country'])) ?>" class="country-tag"><?= htmlspecialchars($article['country']) ?></a>
                         <?php endif; ?>
