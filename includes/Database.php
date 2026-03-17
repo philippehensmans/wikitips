@@ -155,14 +155,18 @@ class Database {
         $this->addColumnIfNotExists('articles', 'view_count', 'INTEGER DEFAULT 0');
 
         // Migration: Migrer les données de article_views vers view_count puis supprimer la table
-        $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='article_views'");
-        if ($stmt->fetch()) {
-            $this->pdo->exec("
-                UPDATE articles SET view_count = (
-                    SELECT COUNT(*) FROM article_views WHERE article_views.article_id = articles.id
-                ) WHERE EXISTS (SELECT 1 FROM article_views WHERE article_views.article_id = articles.id)
-            ");
-            $this->pdo->exec("DROP TABLE article_views");
+        try {
+            $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='article_views'");
+            if ($stmt->fetch()) {
+                $this->pdo->exec("
+                    UPDATE articles SET view_count = (
+                        SELECT COUNT(*) FROM article_views WHERE article_views.article_id = articles.id
+                    ) WHERE EXISTS (SELECT 1 FROM article_views WHERE article_views.article_id = articles.id)
+                ");
+                $this->pdo->exec("DROP TABLE article_views");
+            }
+        } catch (\Exception $e) {
+            // Migration optionnelle, ne pas bloquer le démarrage
         }
 
         // Créer la page d'accueil par défaut si elle n'existe pas
