@@ -30,6 +30,11 @@ define('CRON_SECRET_TOKEN', 'votre-token-cron-secret');
 define('MAILCHIMP_API_KEY', 'votre-api-key-us21');
 define('MAILCHIMP_LIST_ID', 'votre-audience-id');
 
+// Configuration Matomo Analytics
+// Renseignez l'URL de votre instance Matomo et le Site ID pour activer le tracking
+// define('MATOMO_URL', 'https://votre-instance.matomo.cloud/');
+// define('MATOMO_SITE_ID', '1');
+
 // Nom et description du site (optionnel)
 // define('SITE_NAME', 'News - Mon Site');
 // define('SITE_DESCRIPTION', 'Ma description personnalisée');

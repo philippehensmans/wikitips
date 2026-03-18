@@ -22,21 +22,22 @@
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= time() ?>">
     <link rel="icon" href="<?= url('assets/images/favicon.ico') ?>" type="image/x-icon">
     <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars(SITE_NAME) ?>" href="<?= url('feed.php') ?>">
+    <?php if (!empty(MATOMO_URL) && !empty(MATOMO_SITE_ID)): ?>
     <!-- Matomo -->
     <script>
       var _paq = window._paq = window._paq || [];
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
       _paq.push(['trackPageView']);
       _paq.push(['enableLinkTracking']);
       (function() {
-        var u="https://k1mbe.matomo.cloud/";
+        var u=<?= json_encode(rtrim(MATOMO_URL, '/') . '/') ?>;
         _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '1']);
+        _paq.push(['setSiteId', <?= json_encode(MATOMO_SITE_ID) ?>]);
         var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.async=true; g.src='https://cdn.matomo.cloud/k1mbe.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
       })();
     </script>
     <!-- End Matomo Code -->
+    <?php endif; ?>
 </head>
 <body>
     <?php

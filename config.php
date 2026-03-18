@@ -88,6 +88,15 @@ if (!defined('MAILCHIMP_NEWSLETTER_TAG')) {
     define('MAILCHIMP_NEWSLETTER_TAG', 'newsletter-hebdo'); // Tag pour cibler les abonnés newsletter
 }
 
+// Configuration Matomo Analytics
+// Activez le suivi en définissant l'URL de votre instance Matomo
+if (!defined('MATOMO_URL')) {
+    define('MATOMO_URL', ''); // Ex: 'https://votre-instance.matomo.cloud/'
+}
+if (!defined('MATOMO_SITE_ID')) {
+    define('MATOMO_SITE_ID', ''); // Ex: '1'
+}
+
 // Token secret pour les appels cron via HTTP (ex: cron-job.org)
 // Définissez un token aléatoire dans config.local.php
 if (!defined('CRON_SECRET_TOKEN')) {
