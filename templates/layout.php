@@ -22,20 +22,24 @@
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= time() ?>">
     <link rel="icon" href="<?= url('assets/images/favicon.ico') ?>" type="image/x-icon">
     <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars(SITE_NAME) ?>" href="<?= url('feed.php') ?>">
-    <?php if (!empty(MATOMO_URL) && !empty(MATOMO_SITE_ID)): ?>
+    <?php if (!empty(MATOMO_URL) && !empty(MATOMO_SITE_ID)):
+        $matomoBase = rtrim(MATOMO_URL, '/') . '/';
+        $matomoJsSrc = !empty(MATOMO_CDN_URL) ? MATOMO_CDN_URL : $matomoBase . 'matomo.js';
+    ?>
     <!-- Matomo -->
     <script>
       var _paq = window._paq = window._paq || [];
       _paq.push(['trackPageView']);
       _paq.push(['enableLinkTracking']);
       (function() {
-        var u=<?= json_encode(rtrim(MATOMO_URL, '/') . '/') ?>;
+        var u=<?= json_encode($matomoBase) ?>;
         _paq.push(['setTrackerUrl', u+'matomo.php']);
         _paq.push(['setSiteId', <?= json_encode(MATOMO_SITE_ID) ?>]);
         var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        g.async=true; g.src=<?= json_encode($matomoJsSrc) ?>; s.parentNode.insertBefore(g,s);
       })();
     </script>
+    <noscript><img referrerpolicy="no-referrer-when-downgrade" src="<?= htmlspecialchars($matomoBase) ?>matomo.php?idsite=<?= htmlspecialchars(MATOMO_SITE_ID) ?>&amp;rec=1" style="border:0;position:absolute" alt="" /></noscript>
     <!-- End Matomo Code -->
     <?php endif; ?>
 </head>

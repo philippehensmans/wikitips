@@ -91,10 +91,15 @@ if (!defined('MAILCHIMP_NEWSLETTER_TAG')) {
 // Configuration Matomo Analytics
 // Activez le suivi en définissant l'URL de votre instance Matomo
 if (!defined('MATOMO_URL')) {
-    define('MATOMO_URL', ''); // Ex: 'https://votre-instance.matomo.cloud/'
+    define('MATOMO_URL', ''); // Ex: 'https://k1mbe.matomo.cloud/'
 }
 if (!defined('MATOMO_SITE_ID')) {
-    define('MATOMO_SITE_ID', ''); // Ex: '1'
+    define('MATOMO_SITE_ID', ''); // Ex: '2'
+}
+// URL CDN pour Matomo Cloud (optionnel, améliore les performances)
+// Ex: 'https://cdn.matomo.cloud/k1mbe.matomo.cloud/matomo.js'
+if (!defined('MATOMO_CDN_URL')) {
+    define('MATOMO_CDN_URL', '');
 }
 
 // Token secret pour les appels cron via HTTP (ex: cron-job.org)

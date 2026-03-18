@@ -32,8 +32,10 @@ define('MAILCHIMP_LIST_ID', 'votre-audience-id');
 
 // Configuration Matomo Analytics
 // Renseignez l'URL de votre instance Matomo et le Site ID pour activer le tracking
-// define('MATOMO_URL', 'https://votre-instance.matomo.cloud/');
-// define('MATOMO_SITE_ID', '1');
+// Créez un second site dans Matomo si WordPress utilise déjà le Site ID 1
+// define('MATOMO_URL', 'https://k1mbe.matomo.cloud/');
+// define('MATOMO_SITE_ID', '2');
+// define('MATOMO_CDN_URL', 'https://cdn.matomo.cloud/k1mbe.matomo.cloud/matomo.js');
 
 // Nom et description du site (optionnel)
 // define('SITE_NAME', 'News - Mon Site');
