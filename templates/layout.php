@@ -21,6 +21,7 @@
 
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= time() ?>">
     <link rel="icon" href="<?= url('assets/images/favicon.ico') ?>" type="image/x-icon">
+    <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars(SITE_NAME) ?>" href="<?= url('feed.php') ?>">
     <!-- Matomo -->
     <script>
       var _paq = window._paq = window._paq || [];
@@ -135,6 +136,7 @@
                 <h3>Newsletter</h3>
                 <ul>
                     <li><a href="<?= url('newsletter.php') ?>">S'inscrire</a></li>
+                    <li><a href="<?= url('feed.php') ?>">Flux RSS</a></li>
                 </ul>
             </div>
 
