@@ -30,12 +30,12 @@ define('CRON_SECRET_TOKEN', 'votre-token-cron-secret');
 define('MAILCHIMP_API_KEY', 'votre-api-key-us21');
 define('MAILCHIMP_LIST_ID', 'votre-audience-id');
 
-// Configuration Matomo Analytics
-// Renseignez l'URL de votre instance Matomo et le Site ID pour activer le tracking
-// Créez un second site dans Matomo si WordPress utilise déjà le Site ID 1
-// define('MATOMO_URL', 'https://k1mbe.matomo.cloud/');
-// define('MATOMO_SITE_ID', '2');
-// define('MATOMO_CDN_URL', 'https://cdn.matomo.cloud/k1mbe.matomo.cloud/matomo.js');
+// Configuration Matomo Analytics (plugin WP Matomo sur le même domaine)
+// Les URLs pointent vers le plugin Matomo installé dans WordPress
+define('MATOMO_TRACKER_URL', '//www.k1m.be/wp-content/plugins/matomo/app/matomo.php');
+define('MATOMO_JS_URL', '//www.k1m.be/wp-content/uploads/matomo/matomo.js');
+define('MATOMO_SITE_ID', '1');
+define('MATOMO_COOKIE_DOMAIN', '*.www.k1m.be');
 
 // Nom et description du site (optionnel)
 // define('SITE_NAME', 'News - Mon Site');
