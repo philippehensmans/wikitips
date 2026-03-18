@@ -88,6 +88,23 @@ if (!defined('MAILCHIMP_NEWSLETTER_TAG')) {
     define('MAILCHIMP_NEWSLETTER_TAG', 'newsletter-hebdo'); // Tag pour cibler les abonnés newsletter
 }
 
+// Configuration Matomo Analytics
+// Pour le plugin WP Matomo, renseignez les URLs du tracker et du JS
+if (!defined('MATOMO_TRACKER_URL')) {
+    define('MATOMO_TRACKER_URL', ''); // Ex: '//www.k1m.be/wp-content/plugins/matomo/app/matomo.php'
+}
+if (!defined('MATOMO_JS_URL')) {
+    define('MATOMO_JS_URL', ''); // Ex: '//www.k1m.be/wp-content/uploads/matomo/matomo.js'
+}
+if (!defined('MATOMO_SITE_ID')) {
+    define('MATOMO_SITE_ID', ''); // Ex: '1'
+}
+// Domaine cookie pour le tracking cross-sous-domaines (optionnel)
+// Ex: '*.www.k1m.be'
+if (!defined('MATOMO_COOKIE_DOMAIN')) {
+    define('MATOMO_COOKIE_DOMAIN', '');
+}
+
 // Token secret pour les appels cron via HTTP (ex: cron-job.org)
 // Définissez un token aléatoire dans config.local.php
 if (!defined('CRON_SECRET_TOKEN')) {

@@ -22,21 +22,33 @@
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= time() ?>">
     <link rel="icon" href="<?= url('assets/images/favicon.ico') ?>" type="image/x-icon">
     <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars(SITE_NAME) ?>" href="<?= url('feed.php') ?>">
+    <?php if (!empty(MATOMO_TRACKER_URL) && !empty(MATOMO_JS_URL) && !empty(MATOMO_SITE_ID)): ?>
     <!-- Matomo -->
     <script>
-      var _paq = window._paq = window._paq || [];
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
       (function() {
-        var u="https://k1mbe.matomo.cloud/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '1']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.async=true; g.src='https://cdn.matomo.cloud/k1mbe.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+        function initTracking() {
+          var _paq = window._paq = window._paq || [];
+          <?php if (!empty(MATOMO_COOKIE_DOMAIN)): ?>
+          _paq.push(["setCookieDomain", <?= json_encode(MATOMO_COOKIE_DOMAIN) ?>]);
+          <?php endif; ?>
+          _paq.push(['trackPageView']);
+          _paq.push(['enableLinkTracking']);
+          _paq.push(['alwaysUseSendBeacon']);
+          _paq.push(['setTrackerUrl', <?= json_encode(MATOMO_TRACKER_URL) ?>]);
+          _paq.push(['setSiteId', <?= json_encode(MATOMO_SITE_ID) ?>]);
+          var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+          g.async=true; g.src=<?= json_encode(MATOMO_JS_URL) ?>; s.parentNode.insertBefore(g,s);
+        }
+        if (document.prerendering) {
+          document.addEventListener('prerenderingchange', initTracking, {once: true});
+        } else {
+          initTracking();
+        }
       })();
     </script>
+    <noscript><img referrerpolicy="no-referrer-when-downgrade" src="<?= htmlspecialchars(MATOMO_TRACKER_URL) ?>?idsite=<?= htmlspecialchars(MATOMO_SITE_ID) ?>&amp;rec=1" style="border:0;position:absolute" alt="" /></noscript>
     <!-- End Matomo Code -->
+    <?php endif; ?>
 </head>
 <body>
     <?php
