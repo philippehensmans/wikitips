@@ -23,8 +23,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <?php foreach ($articles as $article): ?>
     <item>
         <title><?= htmlspecialchars($article['title']) ?></title>
-        <link><?= htmlspecialchars(SITE_URL . 'article.php?slug=' . urlencode($article['slug'])) ?></link>
-        <guid isPermaLink="true"><?= htmlspecialchars(SITE_URL . 'article.php?slug=' . urlencode($article['slug'])) ?></guid>
+        <link><?= htmlspecialchars(SITE_URL . url('article.php') . '?slug=' . urlencode($article['slug'])) ?></link>
+        <guid isPermaLink="true"><?= htmlspecialchars(SITE_URL . url('article.php') . '?slug=' . urlencode($article['slug'])) ?></guid>
         <pubDate><?= date('r', strtotime($article['created_at'])) ?></pubDate>
 <?php if (!empty($article['summary'])): ?>
         <description><?= htmlspecialchars($article['summary']) ?></description>
