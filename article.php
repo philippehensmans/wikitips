@@ -117,6 +117,106 @@ if (!empty($article['summary'])) {
 $threadsText .= "🔗 " . $articleUrl;
 $threadsUrl = 'https://www.threads.net/intent/post?text=' . rawurlencode($threadsText);
 
+// JSON-LD structuré pour GEO (Generative Engine Optimization)
+$summaryPlainText = !empty($article['summary'])
+    ? html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+    : '';
+$mainPointsPlainText = !empty($article['main_points'])
+    ? html_entity_decode(strip_tags($article['main_points']), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+    : '';
+
+$jsonLd = [
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        // NewsArticle schema
+        [
+            '@type' => 'NewsArticle',
+            'headline' => $article['title'],
+            'url' => $articleUrl,
+            'datePublished' => date('c', strtotime($article['created_at'])),
+            'dateModified' => date('c', strtotime($article['updated_at'] ?? $article['created_at'])),
+            'description' => mb_substr($summaryPlainText, 0, 300),
+            'articleBody' => $summaryPlainText,
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => SITE_NAME,
+                'url' => SITE_URL . '/',
+            ],
+            'mainEntityOfPage' => [
+                '@type' => 'WebPage',
+                '@id' => $articleUrl,
+            ],
+            'inLanguage' => 'fr',
+        ],
+        // BreadcrumbList schema
+        [
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                [
+                    '@type' => 'ListItem',
+                    'position' => 1,
+                    'name' => 'Accueil',
+                    'item' => SITE_URL . url(),
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 2,
+                    'name' => 'Articles',
+                    'item' => SITE_URL . url('articles.php'),
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 3,
+                    'name' => $article['title'],
+                    'item' => $articleUrl,
+                ],
+            ],
+        ],
+    ],
+];
+
+// Ajouter image si disponible
+if (!empty($ogImage)) {
+    $jsonLd['@graph'][0]['image'] = $ogImage;
+}
+
+// Ajouter les catégories comme mots-clés
+if (!empty($article['categories'])) {
+    $jsonLd['@graph'][0]['keywords'] = array_map(fn($cat) => $cat['name'], $article['categories']);
+    $jsonLd['@graph'][0]['articleSection'] = $article['categories'][0]['name'];
+}
+
+// Ajouter le pays comme couverture géographique
+if (!empty($article['country'])) {
+    $jsonLd['@graph'][0]['spatialCoverage'] = [
+        '@type' => 'Place',
+        'name' => $article['country'],
+    ];
+}
+
+// Ajouter la source comme citation
+if (!empty($article['source_url'])) {
+    $jsonLd['@graph'][0]['citation'] = [
+        '@type' => 'WebPage',
+        'url' => $article['source_url'],
+    ];
+}
+
+// Speakable schema pour les assistants vocaux et GEO
+if (!empty($mainPointsPlainText) || !empty($summaryPlainText)) {
+    $speakableSelectors = [];
+    if (!empty($mainPointsPlainText)) {
+        $speakableSelectors[] = '.article-section h2 + *';
+    }
+    if (!empty($summaryPlainText)) {
+        $speakableSelectors[] = '.article-section';
+    }
+    $jsonLd['@graph'][0]['speakable'] = [
+        '@type' => 'SpeakableSpecification',
+        'cssSelector' => $speakableSelectors,
+    ];
+}
+
 ob_start();
 ?>
 
@@ -160,8 +260,8 @@ ob_start();
 </div>
 
 <?php if ($article['source_url']): ?>
-<div class="source-box">
-    <strong>Source :</strong> <a href="<?= htmlspecialchars($article['source_url']) ?>" target="_blank" rel="noopener"><?= htmlspecialchars($article['source_url']) ?></a>
+<div class="source-box" itemscope itemtype="https://schema.org/WebPage">
+    <strong>Source :</strong> <cite><a href="<?= htmlspecialchars($article['source_url']) ?>" target="_blank" rel="noopener" itemprop="url"><?= htmlspecialchars($article['source_url']) ?></a></cite>
 </div>
 <?php endif; ?>
 

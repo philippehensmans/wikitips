@@ -5,6 +5,39 @@
 require_once __DIR__ . '/config.php';
 
 $pageTitle = SITE_NAME . ' - Accueil';
+$ogUrl = SITE_URL . url();
+
+// JSON-LD WebSite avec SearchAction pour GEO
+$jsonLd = [
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        [
+            '@type' => 'WebSite',
+            'name' => SITE_NAME,
+            'url' => SITE_URL . '/',
+            'description' => SITE_DESCRIPTION,
+            'inLanguage' => 'fr',
+            'potentialAction' => [
+                '@type' => 'SearchAction',
+                'target' => [
+                    '@type' => 'EntryPoint',
+                    'urlTemplate' => SITE_URL . url('search.php') . '?q={search_term_string}',
+                ],
+                'query-input' => 'required name=search_term_string',
+            ],
+        ],
+        [
+            '@type' => 'CollectionPage',
+            'name' => 'Articles récents - ' . SITE_NAME,
+            'url' => SITE_URL . url(),
+            'description' => 'Articles récents sur les droits humains : veille, analyse et décryptage.',
+            'isPartOf' => [
+                '@type' => 'WebSite',
+                'name' => SITE_NAME,
+            ],
+        ],
+    ],
+];
 
 // Charger le contenu de la page d'accueil depuis la BDD
 $pageModel = new Page();

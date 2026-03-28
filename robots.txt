@@ -1,0 +1,22 @@
+# robots.txt - News Droits Humains
+# Autoriser tous les crawlers (moteurs de recherche et IA)
+
+User-agent: *
+Allow: /
+
+# Bloquer les pages d'administration et techniques
+Disallow: /login.php
+Disallow: /users.php
+Disallow: /new.php
+Disallow: /edit.php
+Disallow: /edit-page.php
+Disallow: /import.php
+Disallow: /share-bluesky.php
+Disallow: /api/
+Disallow: /data/
+Disallow: /includes/
+Disallow: /cron/
+Disallow: /cron.php
+Disallow: /subscribers.php
+Disallow: /profile.php
+Disallow: /logout.php
