@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? SITE_NAME) ?></title>
 
+    <!-- Meta description pour SEO/GEO -->
+    <?php if (!empty($ogDescription)): ?>
+    <meta name="description" content="<?= htmlspecialchars(mb_substr(strip_tags(html_entity_decode($ogDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8')), 0, 160)) ?>">
+    <?php else: ?>
+    <meta name="description" content="<?= htmlspecialchars(SITE_DESCRIPTION) ?>">
+    <?php endif; ?>
+
+    <!-- Canonical URL -->
+    <?php if (!empty($ogUrl)): ?>
+    <link rel="canonical" href="<?= htmlspecialchars($ogUrl) ?>">
+    <?php else: ?>
+    <link rel="canonical" href="<?= htmlspecialchars(SITE_URL . ($_SERVER['REQUEST_URI'] ?? '/')) ?>">
+    <?php endif; ?>
+
     <!-- Open Graph / LinkedIn / Facebook -->
     <meta property="og:type" content="<?= $ogType ?? 'website' ?>">
     <meta property="og:site_name" content="<?= SITE_NAME ?>">
@@ -19,9 +33,38 @@
     <meta property="og:image" content="<?= htmlspecialchars($ogImage) ?>">
     <?php endif; ?>
 
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="<?= !empty($ogImage) ? 'summary_large_image' : 'summary' ?>">
+    <meta name="twitter:title" content="<?= htmlspecialchars($ogTitle ?? $pageTitle ?? SITE_NAME) ?>">
+    <?php if (!empty($ogDescription)): ?>
+    <meta name="twitter:description" content="<?= htmlspecialchars($ogDescription) ?>">
+    <?php endif; ?>
+    <?php if (!empty($ogImage)): ?>
+    <meta name="twitter:image" content="<?= htmlspecialchars($ogImage) ?>">
+    <?php endif; ?>
+
+    <!-- JSON-LD Organization (base) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": <?= json_encode(SITE_NAME) ?>,
+        "url": <?= json_encode(SITE_URL . '/') ?>,
+        "description": <?= json_encode(SITE_DESCRIPTION) ?>
+    }
+    </script>
+
+    <!-- JSON-LD structuré spécifique à la page -->
+    <?php if (!empty($jsonLd)): ?>
+    <script type="application/ld+json">
+    <?= json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?>
+    </script>
+    <?php endif; ?>
+
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= time() ?>">
     <link rel="icon" href="<?= url('assets/images/favicon.ico') ?>" type="image/x-icon">
     <link rel="alternate" type="application/rss+xml" title="<?= htmlspecialchars(SITE_NAME) ?>" href="<?= url('feed.php') ?>">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="<?= url('sitemap.php') ?>">
     <?php if (!empty(MATOMO_TRACKER_URL) && !empty(MATOMO_JS_URL) && !empty(MATOMO_SITE_ID)): ?>
     <!-- Matomo -->
     <script>
