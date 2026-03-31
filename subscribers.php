@@ -147,11 +147,11 @@ define('MAILCHIMP_LIST_ID', 'votre-audience-id');</pre>
                 </div>
                 <div class="infobox-row">
                     <div class="infobox-label">Taux ouverture</div>
-                    <div class="infobox-value"><?= round($stats['open_rate'] * 100, 1) ?>%</div>
+                    <div class="infobox-value"><?= round($stats['open_rate'], 1) ?>%</div>
                 </div>
                 <div class="infobox-row">
                     <div class="infobox-label">Taux clics</div>
-                    <div class="infobox-value"><?= round($stats['click_rate'] * 100, 1) ?>%</div>
+                    <div class="infobox-value"><?= round($stats['click_rate'], 1) ?>%</div>
                 </div>
             </div>
         </div>
