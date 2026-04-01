@@ -71,6 +71,7 @@
       (function() {
         function initTracking() {
           var _paq = window._paq = window._paq || [];
+          _paq.push(['disableCookies']);
           <?php if (!empty(MATOMO_COOKIE_DOMAIN)): ?>
           _paq.push(["setCookieDomain", <?= json_encode(MATOMO_COOKIE_DOMAIN) ?>]);
           <?php endif; ?>
