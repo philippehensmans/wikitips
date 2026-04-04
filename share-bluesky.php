@@ -49,7 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Le texte ne doit pas dépasser 300 caractères.';
     } else {
         $title = $article['title'];
-        $description = mb_substr($article['summary'] ?? '', 0, 150);
+        $description = html_entity_decode(strip_tags($article['summary'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $description = mb_substr($description, 0, 150);
         $thumbUrl = $article['og_image'] ?? null;
 
         $result = $bluesky->createPost($text, $articleUrl, $title, $description, $thumbUrl);
@@ -78,7 +79,8 @@ ob_start();
         <div class="infobox-header"><?= htmlspecialchars($article['title']) ?></div>
         <div class="infobox-content">
             <?php if ($article['summary']): ?>
-            <p><?= htmlspecialchars(mb_substr($article['summary'], 0, 200)) ?><?= mb_strlen($article['summary']) > 200 ? '...' : '' ?></p>
+            <?php $cleanSummary = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>
+            <p><?= htmlspecialchars(mb_substr($cleanSummary, 0, 200)) ?><?= mb_strlen($cleanSummary) > 200 ? '...' : '' ?></p>
             <?php endif; ?>
             <p><small>🔗 <?= htmlspecialchars($articleUrl) ?></small></p>
         </div>
