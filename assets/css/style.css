@@ -1547,12 +1547,14 @@ a:hover {
     margin-bottom: 10px;
 }
 
-.article-content figure {
+.article-content figure,
+.article-section figure {
     margin: 20px 0;
     text-align: center;
 }
 
-.article-content figcaption {
+.article-content figcaption,
+.article-section figcaption {
     font-size: 12px;
     color: var(--wiki-text-light);
     margin-top: 8px;

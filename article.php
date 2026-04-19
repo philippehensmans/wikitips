@@ -340,14 +340,14 @@ $ttsText = trim(preg_replace('/\s+/', ' ', $ttsText));
 <?php if ($article['main_points']): ?>
 <div class="article-section">
     <h2>Points principaux</h2>
-    <?= $article['main_points'] ?>
+    <?= addImageCaption($article['main_points'], $articleUrl) ?>
 </div>
 <?php endif; ?>
 
 <?php if ($article['summary']): ?>
 <div class="article-section">
     <h2>Résumé</h2>
-    <?= $article['summary'] ?>
+    <?= addImageCaption($article['summary'], $articleUrl) ?>
 </div>
 <?php endif; ?>
 
@@ -361,7 +361,7 @@ $ttsText = trim(preg_replace('/\s+/', ' ', $ttsText));
 <?php if ($article['content']): ?>
 <div class="article-section">
     <h2>Contenu</h2>
-    <div class="article-content"><?= $article['content'] ?></div>
+    <div class="article-content"><?= addImageCaption($article['content'], $articleUrl) ?></div>
 </div>
 <?php endif; ?>
 

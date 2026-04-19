@@ -216,6 +216,59 @@ function extractFirstImage(string $html): ?string {
     return null;
 }
 
+/**
+ * Ajoute l'URL de l'article en italique sous chaque image du contenu HTML.
+ * - Les images déjà dans une <figure> reçoivent (ou voient compléter) un <figcaption>.
+ * - Les images isolées sont enveloppées dans une <figure> avec <figcaption>.
+ */
+function addImageCaption(string $html, string $url): string {
+    if (empty($html) || stripos($html, '<img') === false || empty($url)) {
+        return $html;
+    }
+
+    $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+    $emUrl = '<em>' . $safeUrl . '</em>';
+
+    // Séparer le HTML en tronçons : dans/hors <figure>
+    $parts = preg_split('/(<figure\b[^>]*>.*?<\/figure>)/is', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+    foreach ($parts as $i => &$part) {
+        if ($i % 2 === 1) {
+            // Tronçon : bloc <figure>...</figure>
+            if (strpos($part, $url) !== false) {
+                continue;
+            }
+            if (preg_match('/<figcaption\b[^>]*>.*?<\/figcaption>/is', $part)) {
+                // Ajouter l'URL à la fin du <figcaption> existant
+                $part = preg_replace(
+                    '/<\/figcaption>/i',
+                    '<br>' . $emUrl . '</figcaption>',
+                    $part,
+                    1
+                );
+            } else {
+                // Insérer un <figcaption> avant </figure>
+                $part = preg_replace(
+                    '/<\/figure>/i',
+                    '<figcaption>' . $emUrl . '</figcaption></figure>',
+                    $part,
+                    1
+                );
+            }
+        } else {
+            // Tronçon hors <figure> : envelopper les <img> isolées
+            $part = preg_replace(
+                '/(<img\b[^>]*\/?>)/i',
+                '<figure>$1<figcaption>' . $emUrl . '</figcaption></figure>',
+                $part
+            );
+        }
+    }
+    unset($part);
+
+    return implode('', $parts);
+}
+
 // Démarrer la session tôt pour éviter "headers already sent"
 if (session_status() === PHP_SESSION_NONE && php_sapi_name() !== 'cli') {
     session_start();
