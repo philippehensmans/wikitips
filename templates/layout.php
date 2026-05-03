@@ -220,6 +220,7 @@
     <footer class="wiki-footer">
         <p>&copy; <?= date('Y') ?> <?= SITE_NAME ?>. Veille et analyse sous l'angle des droits humains.</p>
         <p>Les analyses sont générées avec l'aide de l'IA et doivent être vérifiées.</p>
+        <p>Merci à Althea Williams pour aide précieuse et acérée</p>
     </footer>
 
     <script src="<?= url('assets/js/app.js') ?>?v=<?= time() ?>"></script>
