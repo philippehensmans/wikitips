@@ -83,6 +83,13 @@ $facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($a
 
 // Message Facebook (sera copié dans le presse-papiers)
 $facebookText = "📰 " . $article['title'] . "\n\n";
+if (!empty($article['source_url'])) {
+    $sourceHost = parse_url($article['source_url'], PHP_URL_HOST);
+    if ($sourceHost) {
+        $sourceDomain = preg_replace('/^www\./i', '', $sourceHost);
+        $facebookText .= "Résumé de " . $sourceDomain . "\n\n";
+    }
+}
 if (!empty($article['summary'])) {
     $summaryCleanFb = html_entity_decode(strip_tags($article['summary']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $facebookText .= $summaryCleanFb . "\n\n";
