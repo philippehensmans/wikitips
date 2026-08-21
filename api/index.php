@@ -87,6 +87,14 @@ function handleRequest(string $method, array $segments, array $input): array {
  * Gérer les articles
  */
 function handleArticles(string $method, ?string $id, array $input): array {
+    if (in_array($method, ['POST', 'PUT', 'DELETE'])) {
+        $auth = new Auth();
+        if (!$auth->isLoggedIn()) {
+            http_response_code(401);
+            return ['error' => true, 'message' => 'Authentification requise'];
+        }
+    }
+
     $article = new Article();
 
     switch ($method) {

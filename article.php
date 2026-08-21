@@ -46,6 +46,9 @@ $articleUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https:/
 $articleUrl .= $_SERVER['HTTP_HOST'];
 $articleUrl .= url('article.php?slug=' . urlencode($article['slug']));
 
+// URL d'intention Bluesky (ouvre le compositeur dans le compte du visiteur)
+$bskyIntentUrl = 'https://bsky.app/intent/compose?text=' . rawurlencode($article['title'] . "\n" . $articleUrl);
+
 // Open Graph pour les réseaux sociaux (LinkedIn, Facebook, etc.)
 $ogTitle = $article['title'];
 $ogType = 'article';
@@ -239,16 +242,21 @@ ob_start();
 
 <div class="article-header">
     <div class="article-actions">
+        <?php if ($isAdmin): ?>
         <a href="<?= url('edit.php?id=' . $article['id']) ?>">Modifier</a>
+        <?php endif; ?>
         <a href="<?= htmlspecialchars($whatsappUrl) ?>" class="btn-whatsapp" target="_blank" title="Partager sur WhatsApp">💬 WhatsApp</a>
         <a href="#" onclick="shareOnFacebook(); return false;" class="btn-facebook" title="Partager sur Facebook">📘 Facebook</a>
         <a href="#" onclick="shareOnLinkedin(); return false;" class="btn-linkedin" title="Partager sur LinkedIn">💼 LinkedIn</a>
         <a href="<?= htmlspecialchars($twitterUrl) ?>" class="btn-twitter" target="_blank" title="Partager sur X (Twitter)">𝕏 Twitter</a>
         <a href="<?= htmlspecialchars($threadsUrl) ?>" class="btn-threads" target="_blank" title="Partager sur Threads">🧵 Threads</a>
-        <?php if ($blueskyConfigured): ?>
-        <a href="<?= url('share-bluesky.php?id=' . $article['id']) ?>" class="btn-bluesky" title="Partager sur Bluesky">🦋 Bluesky</a>
+        <a href="<?= htmlspecialchars($bskyIntentUrl) ?>" class="btn-bluesky" target="_blank" rel="noopener" title="Partager sur Bluesky">🦋 Bluesky</a>
+        <?php if ($isAdmin && $blueskyConfigured): ?>
+        <a href="<?= url('share-bluesky.php?id=' . $article['id']) ?>" class="btn-bluesky" title="Publier depuis le compte du site">🦋 Bluesky (site)</a>
         <?php endif; ?>
+        <?php if ($isAdmin): ?>
         <a href="#" onclick="confirmDelete(<?= $article['id'] ?>); return false;">Supprimer</a>
+        <?php endif; ?>
     </div>
     <h1><?= htmlspecialchars($article['title']) ?></h1>
     <div class="article-meta">
