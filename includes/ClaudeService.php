@@ -57,25 +57,7 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans ```json) cont
         "Point principal 4",
         "Point principal 5"
     ],
-    "human_rights_analysis": {
-        "civil_political_rights": {
-            "relevant": true/false,
-            "points": ["Point d'attention 1", "Point d'attention 2"],
-            "concerns": ["Préoccupation éventuelle"]
-        },
-        "economic_social_cultural_rights": {
-            "relevant": true/false,
-            "points": ["Point d'attention 1"],
-            "concerns": ["Préoccupation éventuelle"]
-        },
-        "international_humanitarian_law": {
-            "relevant": true/false,
-            "points": ["Point d'attention 1"],
-            "concerns": ["Préoccupation éventuelle"]
-        },
-        "overall_assessment": "Évaluation globale sous l'angle des droits humains (2-3 phrases)",
-        "recommendations": ["Recommandation 1", "Recommandation 2"]
-    },
+    "human_rights_analysis": {},
     "suggested_categories": ["droits-civils-politiques", "non-discrimination"],
     "country": "Pays principal concerné par l'article (nom du pays en français, ex: 'France', 'États-Unis', 'Palestine', 'Israël', 'Ukraine', 'Russie', etc.). Si plusieurs pays sont concernés, indiquer le pays principal. Si l'article concerne une région ou est global, indiquer 'International'. Ne jamais laisser vide."
 }
@@ -164,17 +146,14 @@ PROMPT;
         }
         $mainPointsHtml .= '</ul>';
 
-        // Formater l'analyse des droits humains en HTML
-        $analysisHtml = $this->formatHumanRightsAnalysis($data['human_rights_analysis'] ?? []);
-
         return [
             'title' => $data['title'] ?? 'Sans titre',
             'summary' => $this->formatSummaryAsHtml($data['summary'] ?? ''),
             'bluesky_post' => $data['bluesky_post'] ?? '',
             'main_points' => $mainPointsHtml,
             'main_points_raw' => $data['main_points'] ?? [],
-            'human_rights_analysis' => $analysisHtml,
-            'human_rights_analysis_raw' => $data['human_rights_analysis'] ?? [],
+            'human_rights_analysis' => '',
+            'human_rights_analysis_raw' => [],
             'suggested_categories' => $data['suggested_categories'] ?? [],
             'country' => $data['country'] ?? null
         ];
