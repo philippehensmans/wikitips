@@ -25,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $summary = trim($_POST['summary'] ?? '');
     $mainPoints = trim($_POST['main_points'] ?? '');
-    $humanRightsAnalysis = trim($_POST['human_rights_analysis'] ?? '');
     $content = trim($_POST['content'] ?? '');
     $sourceUrl = trim($_POST['source_url'] ?? '');
     $status = $_POST['status'] ?? 'draft';
@@ -47,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'title' => $title,
             'summary' => $summary,
             'main_points' => $mainPoints,
-            'human_rights_analysis' => $humanRightsAnalysis,
             'content' => $content,
             'source_url' => $sourceUrl,
             'status' => $status,
@@ -126,11 +124,12 @@ ob_start();
             <textarea id="summary" name="summary" rows="4" class="tinymce-summary"><?= $_POST['summary'] ?? '' ?></textarea>
         </div>
 
-        <div class="form-group">
+        <!-- Analyse des droits humains désactivée -->
+        <!-- <div class="form-group">
             <label for="human_rights_analysis">Analyse des droits humains (HTML)</label>
             <textarea id="human_rights_analysis" name="human_rights_analysis" class="large"><?= htmlspecialchars($_POST['human_rights_analysis'] ?? '') ?></textarea>
             <p class="help-text">Analyse sous l'angle des droits humains, droit international humanitaire, etc.</p>
-        </div>
+        </div> -->
 
         <div class="form-group">
             <label for="content">Contenu</label>
